@@ -18,14 +18,6 @@ type App struct {
 	drag  bool
 }
 
-type Scene interface {
-	Update() error
-	Layout(ow, oh int) (bw, bh int)
-	Draw(screen *ebiten.Image)
-	SetBounds(r image.Rectangle)
-	Bounds() (r image.Rectangle)
-}
-
 func (u *App) Layout(ow, oh int) (bw, bh int) {
 	var (
 		uiScale = 2
@@ -60,9 +52,7 @@ func (u *App) HandleInput() bool {
 		return false
 	}
 
-	// if u.layers[cnt - 1]
-
-	return false
+	return u.layers[cnt-1].HandleInput()
 }
 
 func (u *App) HandleDrag() bool {
@@ -90,7 +80,6 @@ func (u *App) HandleDrag() bool {
 }
 
 func (u *App) Update() error {
-
 	u.HandleInput()
 	u.HandleDrag()
 
@@ -116,36 +105,4 @@ func (u *App) Load(scene Scene) {
 
 func (u *App) Quit() {
 	u.quit = true
-}
-
-func Quit() {
-	app.Quit()
-}
-
-func Load(scene Scene) {
-	app.Load(scene)
-}
-
-var app *App
-
-type AppOpt func(u *App)
-type AppOptions struct{}
-
-var Options AppOptions
-
-func (AppOptions) OnInput(fn func() bool) AppOpt {
-	return func(u *App) {
-		u.onInput = append(u.onInput, fn)
-	}
-}
-
-func New(opts ...AppOpt) *App {
-	app = &App{
-		uiScale: 2,
-	}
-	for _, o := range opts {
-		o(app)
-	}
-
-	return app
 }
