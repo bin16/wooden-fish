@@ -27,3 +27,11 @@ func (u *Scene) SetBounds(r image.Rectangle) {
 func (u *Scene) Bounds() (r image.Rectangle) {
 	return u.bounds
 }
+
+func (u *Scene) HandleInput() bool {
+	return false
+}
+
+func (u *Scene) HandleMouseInput() bool {
+	return false
+}

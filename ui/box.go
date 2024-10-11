@@ -11,7 +11,28 @@ import (
 type Box struct {
 	Scene
 	children []app.Scene
+	cr       image.Rectangle
 	sr       []image.Rectangle
+}
+
+func (u *Box) HandleInput() bool {
+	for _, n := range u.children {
+		if n.HandleInput() {
+			return true
+		}
+	}
+
+	return false
+}
+
+func (u *Box) HandleMouseInput() bool {
+	for _, n := range u.children {
+		if n.HandleInput() {
+			return true
+		}
+	}
+
+	return false
 }
 
 func (u *Box) AddChild(n app.Scene) {
@@ -79,6 +100,16 @@ func (u *Box) SetBounds(r image.Rectangle) {
 }
 
 type BoxOpt func(box *Box)
+
+type BoxOptions struct{}
+
+var BoxOpts BoxOptions
+
+func (BoxOptions) Contents(items ...app.Scene) BoxOpt {
+	return func(box *Box) {
+		box.children = append(box.children, items...)
+	}
+}
 
 func NewBox(opts ...BoxOpt) *Box {
 	var box = &Box{}
