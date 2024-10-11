@@ -22,6 +22,7 @@ type Anim struct {
 	tick         int
 	maxTick      int
 	frameHandler map[int][]func()
+	playing      bool
 }
 
 func (u *Anim) Layout(ow, oh int) (bw, bh int) {
@@ -65,19 +66,30 @@ func (u *Anim) triggerFrame(index int) {
 }
 
 func (u *Anim) Update() error {
-	u.tick += 1
-	if u.tick > ebiten.TPS()/u.FPS {
-		u.tick = 0
-		u.index += 1
-		u.triggerFrame(u.index)
-	}
+	if u.playing {
+		u.tick += 1
+		if u.tick > ebiten.TPS()/u.FPS {
+			u.tick = 0
+			u.index += 1
+			u.triggerFrame(u.index)
+		}
 
-	var max = u.image.Bounds().Dy()/u.height - 1
-	if u.index > max {
-		u.index = 0
+		var max = u.image.Bounds().Dy()/u.height - 1
+		if u.index > max {
+			u.index = 0
+			u.playing = u.loop
+		}
 	}
 
 	return nil
+}
+
+func (u *Anim) Play() {
+	if !u.playing {
+		u.playing = true
+		u.index = 0
+		u.tick = 0
+	}
 }
 
 type AnimOpt func(u *Anim)
@@ -108,6 +120,18 @@ func (AnimOptions) Size(w, h int) AnimOpt {
 func (AnimOptions) FPS(d int) AnimOpt {
 	return func(u *Anim) {
 		u.FPS = d
+	}
+}
+
+func (AnimOptions) Loop(b bool) AnimOpt {
+	return func(u *Anim) {
+		u.loop = b
+	}
+}
+
+func (AnimOptions) AutoPlay(b bool) AnimOpt {
+	return func(u *Anim) {
+		u.playing = true
 	}
 }
 

@@ -8,7 +8,18 @@ import (
 type Window struct {
 	Box
 
-	text *Text
+	text    *Text
+	onInput []func() bool
+}
+
+func (u *Window) HandleInput() bool {
+	for _, fn := range u.onInput {
+		if fn() {
+			return true
+		}
+	}
+
+	return u.Box.HandleInput()
 }
 
 func (u *Window) Draw(screen *ebiten.Image) {
@@ -32,6 +43,12 @@ var WinOpts WinOptions
 func (WinOptions) Contents(items ...app.Scene) WinOpt {
 	return func(win *Window) {
 		win.children = append(win.children, items...)
+	}
+}
+
+func (WinOptions) OnInput(fn func() bool) WinOpt {
+	return func(win *Window) {
+		win.onInput = append(win.onInput, fn)
 	}
 }
 
