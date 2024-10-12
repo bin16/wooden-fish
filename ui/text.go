@@ -4,6 +4,7 @@ import (
 	"image/color"
 	"math"
 
+	"github.com/bin16/wooden-fish/app"
 	"github.com/hajimehoshi/bitmapfont/v3"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/text/v2"
@@ -16,6 +17,7 @@ type Text struct {
 	textContent string
 	face        text.Face
 	color       color.Color
+	padding     app.Space
 }
 
 func (u *Text) SetColor(clr color.Color) {
@@ -44,8 +46,8 @@ func (u *Text) Layout(ow, oh int) (bw, bh int) {
 	}
 
 	var tw, th = text.Measure(u.textContent, u.face, lh)
-	bw = int(math.Ceil(tw))
-	bh = int(math.Ceil(th))
+	bw = int(math.Ceil(tw)) + u.padding.X()
+	bh = int(math.Ceil(th)) + u.padding.Y()
 	return
 }
 
@@ -53,11 +55,14 @@ func (u *Text) Draw(screen *ebiten.Image) {
 	var op = &text.DrawOptions{}
 	if clr := u.color; clr != nil {
 		op.ColorScale.ScaleWithColor(clr)
+	} else if clr := app.Theme.Color; clr != nil {
+		op.ColorScale.ScaleWithColor(clr)
 	}
 
+	var p = u.Bounds().Min.Add(u.padding.TopLeft())
 	op.GeoM.Translate(
-		float64(u.Bounds().Min.X),
-		float64(u.Bounds().Min.Y),
+		float64(p.X),
+		float64(p.Y),
 	)
 
 	text.Draw(screen, u.textContent, u.face, op)
@@ -67,6 +72,12 @@ type TextOpt func(text *Text)
 type TextOptions struct{}
 
 var TextOpts TextOptions
+
+func (TextOptions) Padding(num ...int) TextOpt {
+	return func(text *Text) {
+		text.padding = app.NewSpace(num...)
+	}
+}
 
 func (TextOptions) Content(s string) TextOpt {
 	return func(text *Text) {
@@ -94,8 +105,7 @@ func (TextOptions) FontFace(face font.Face) TextOpt {
 
 func NewText(opts ...TextOpt) *Text {
 	var text = &Text{
-		face:  text.NewGoXFace(bitmapfont.FaceSC),
-		color: color.Black,
+		face: text.NewGoXFace(bitmapfont.FaceSC),
 	}
 	for _, o := range opts {
 		o(text)

@@ -113,5 +113,9 @@ func (BoxOptions) Contents(items ...app.Scene) BoxOpt {
 
 func NewBox(opts ...BoxOpt) *Box {
 	var box = &Box{}
+	for _, o := range opts {
+		o(box)
+	}
+
 	return box
 }
