@@ -23,20 +23,23 @@ type App struct {
 }
 
 func (app *App) Layout(ow, oh int) (bw, bh int) {
-	var w, h = app.CanvasSize()
+	var w, h = app.CanvasSize(ow, oh)
 
 	return app.stack.Layout(w, h)
 }
 
-func (app *App) CanvasSize() (w, h int) {
+func (app *App) CanvasSize(ow, oh int) (w, h int) {
 	var scale = app.uiScale
-	var ow, oh = ebiten.WindowSize()
 	w = int(math.Round(float64(ow) / scale))
 	h = int(math.Round(float64(oh) / scale))
 	return
 }
 
 func (u *App) Draw(screen *ebiten.Image) {
+	if clr := Theme.BackgroundColor; clr != nil {
+		screen.Fill(clr)
+	}
+
 	u.stack.Draw(screen)
 }
 
