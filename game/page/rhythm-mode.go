@@ -14,41 +14,56 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
 
-func NewFreeMode() app.Scene {
+func NewRaythm() *ui.Page {
 	var title = ui.NewUpper()
+
+	var (
+		activeFrame = 5
+		knocked     = false
+	)
 
 	var anim = ui.NewAnim(
 		ui.AnimOpts.NewImageFromBytes(assets.DefaultAnimSheetBytes),
 		ui.AnimOpts.Size(32, 32),
-		ui.AnimOpts.FPS(30),
-		ui.AnimOpts.OnFrame(5, func() {
-			var s, _ = vorbis.DecodeF32(bytes.NewReader(assets.DefaultSoundBytes))
-			var ply, _ = util.AudioContext.NewPlayerF32(s)
-
-			ply.Play()
-			title.NewText(i18n.T(i18n.MeritPlusOne))
-
+		ui.AnimOpts.FPS(6),
+		ui.AnimOpts.Loop(true),
+		ui.AnimOpts.AutoPlay(true),
+		ui.AnimOpts.OnFrame(activeFrame, func() {
 			game.Tick()
+		}),
+		ui.AnchorOpts.OnEnd(func() {
+			if !knocked {
+				title.NewText(i18n.Miss)
+			}
+
+			knocked = false
 		}),
 	)
 
-	var main = ui.Center(
-		ui.NewVBox(
-			ui.VBoxOpts.AlignItems(ui.AlignCenter),
-			ui.VBoxOpts.Contents(
-				title,
-				anim,
-			),
-		),
-	)
+	var playSound = func() {
+		if knocked {
+			return
+		}
 
-	var statInfo = ui.Top(
-		ui.NewText(
-			ui.TextOpts.Pull(func() string {
-				return i18n.T(i18n.Merits_Is, game.Game.Count)
-			}),
-		),
-	)
+		var s, _ = vorbis.DecodeF32(bytes.NewReader(assets.DefaultSoundBytes))
+		var ply, _ = util.AudioContext.NewPlayerF32(s)
+
+		var d = anim.FrameIndex() - activeFrame
+		if d < 0 {
+			d = -d
+		}
+
+		if d == 0 {
+			title.NewText(i18n.Perfect)
+		} else if d == 1 {
+			title.NewText(i18n.Good)
+		} else {
+			title.NewText(i18n.Miss)
+		}
+
+		ply.Play()
+		knocked = true
+	}
 
 	var helpExit = ui.BottomLeft(
 		ui.NewHBox(
@@ -81,13 +96,23 @@ func NewFreeMode() app.Scene {
 		),
 	)
 
+	var main = ui.Center(
+		ui.NewVBox(
+			ui.VBoxOpts.AlignItems(ui.AlignCenter),
+			ui.VBoxOpts.Contents(
+				title,
+				anim,
+			),
+		),
+	)
+
 	var p = ui.NewSpace(ui.SpaceOpts.Space(4))
 
 	var page = ui.NewPage(
 		ui.PageOpts.Fill(app.Theme.BackgroundColor),
 		ui.PageOpts.OnInput(func() bool {
 			if inpututil.IsKeyJustPressed(ebiten.KeyEnter) {
-				anim.Play()
+				playSound()
 				return true
 			}
 
@@ -103,10 +128,10 @@ func NewFreeMode() app.Scene {
 				main,
 				helpExit,
 				helpEnter,
-				statInfo,
 			)),
 		),
 	)
 
 	return page
+
 }

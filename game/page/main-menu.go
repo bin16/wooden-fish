@@ -14,21 +14,50 @@ func MainMenu() *ui.Page {
 		ui.MenuOpts.TextItem(i18n.T(i18n.FreeMode), func() {
 			app.Load(NewFreeMode())
 		}),
-		ui.MenuOpts.TextItem(i18n.T(i18n.Quit), func() {
-			app.Quit()
+		ui.MenuOpts.TextItem(i18n.T(i18n.RhythmMode), func() {
+			app.Load(NewRaythm())
 		}),
+		ui.MenuOpts.TextItem(i18n.T(i18n.Settings), func() {
+			app.Load(NewSettings())
+		}),
+		// ui.MenuOpts.TextItem(i18n.T(i18n.Quit), func() {
+		// 	app.Quit()
+		// }),
 	)
 
-	var box = ui.NewBox(
-		ui.BoxOpts.Contents(menu),
+	var version = NewVersionInfo()
+
+	var title = ui.NewText(
+		ui.TextOpts.Color(app.Theme.SecondaryColor),
+		ui.TextOpts.Content(i18n.T(i18n.APP_NAME)),
+		ui.TextOpts.Padding(0, 0, 8, 0),
+	)
+
+	var box = ui.NewVBox(
+		ui.VBoxOpts.AlignItems(ui.AlignCenter),
+		ui.VBoxOpts.Contents(
+			title,
+			menu,
+		),
 	)
 
 	var page = ui.NewPage(
 		ui.PageOpts.Fill(app.Theme.BackgroundColor),
 		ui.PageOpts.Contents(
-			box,
+			ui.Layers(
+				ui.Center(box),
+				version,
+			),
 		),
 	)
 
 	return page
+}
+
+func NewVersionInfo() *ui.Anchor {
+	return ui.BottomLeft(ui.NewText(
+		ui.TextOpts.Color(app.Theme.SecondaryColor),
+		ui.TextOpts.Content("v0.5.0"),
+		ui.TextOpts.Padding(4),
+	))
 }
