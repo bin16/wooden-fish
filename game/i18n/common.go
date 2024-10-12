@@ -26,7 +26,7 @@ var (
 	Good    = "Good"
 	Miss    = "Miss"
 
-	Knock = "Knock"
+	Beat = "Beat"
 
 	WoodenFish = "Wooden Fish"
 
@@ -54,7 +54,7 @@ func init() {
 	message.SetString(SC, Merits_Is, "功德：%d")
 	message.SetString(SC, Exit, "退出")
 	message.SetString(SC, Back, "返回")
-	message.SetString(SC, Knock, "敲")
+	message.SetString(SC, Beat, "敲")
 	message.SetString(SC, WoodenFish, "木鱼")
 }
 

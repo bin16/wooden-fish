@@ -1,2 +1,4 @@
 *.exe
 *.save.json
+build/
+build.ps1

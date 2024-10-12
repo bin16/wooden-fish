@@ -74,7 +74,7 @@ func NewFreeMode() app.Scene {
 					ui.TextOpts.Color(app.Theme.SecondaryColor),
 				),
 				ui.NewText(
-					ui.TextOpts.Content(i18n.T(i18n.Knock)),
+					ui.TextOpts.Content(i18n.T(i18n.Beat)),
 					ui.TextOpts.Color(app.Theme.SecondaryColor),
 				),
 			),
