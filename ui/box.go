@@ -89,13 +89,15 @@ func (u *Box) Layout(ow, oh int) (bw, bh int) {
 
 func (u *Box) SetBounds(r image.Rectangle) {
 	u.Scene.SetBounds(r)
-	for i, n := range u.children {
-		var (
-			x = (r.Dx() - u.sr[i].Dx()) / 2
-			y = (r.Dy() - u.sr[i].Dy()) / 2
-		)
+	for _, n := range u.children {
+		// var (
+		// 	x = (r.Dx() - u.sr[i].Dx()) / 2
+		// 	y = (r.Dy() - u.sr[i].Dy()) / 2
+		// )
 
-		n.SetBounds(u.sr[i].Add(image.Pt(x, y)).Add(r.Min))
+		// n.SetBounds(u.sr[i].Add(image.Pt(x, y)).Add(r.Min))
+
+		n.SetBounds(r)
 	}
 }
 

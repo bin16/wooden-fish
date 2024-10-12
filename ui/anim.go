@@ -22,6 +22,7 @@ type Anim struct {
 	tick         int
 	maxTick      int
 	frameHandler map[int][]func()
+	onEnd        []func()
 	playing      bool
 }
 
@@ -35,6 +36,10 @@ func (u *Anim) Draw(screen *ebiten.Image) {
 			hexcolor.Parse("#c00"),
 		)
 
+		return
+	}
+
+	if u.Bounds().Empty() {
 		return
 	}
 
@@ -77,6 +82,9 @@ func (u *Anim) Update() error {
 		var max = u.image.Bounds().Dy()/u.height - 1
 		if u.index > max {
 			u.index = 0
+			for _, fn := range u.onEnd {
+				fn()
+			}
 			u.playing = u.loop
 		}
 	}
@@ -90,6 +98,18 @@ func (u *Anim) Play() {
 		u.index = 0
 		u.tick = 0
 	}
+}
+
+func (u *Anim) IsPlaying() bool {
+	return u.playing
+}
+
+func (u *Anim) FrameIndex() int {
+	return u.index
+}
+
+func (u *Anim) OnEnd(fn func()) {
+	u.onEnd = append(u.onEnd, fn)
 }
 
 type AnimOpt func(u *Anim)
@@ -132,6 +152,12 @@ func (AnimOptions) Loop(b bool) AnimOpt {
 func (AnimOptions) AutoPlay(b bool) AnimOpt {
 	return func(u *Anim) {
 		u.playing = true
+	}
+}
+
+func (AnchorOptions) OnEnd(fn func()) AnimOpt {
+	return func(u *Anim) {
+		u.OnEnd(fn)
 	}
 }
 

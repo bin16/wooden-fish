@@ -96,6 +96,13 @@ func NewAnchor(opts ...AnchorOpt) func(content app.Scene) *Anchor {
 	}
 }
 
+func Top(content app.Scene) *Anchor {
+	return NewAnchor(
+		AnchorOpts.HAlign(AlignCenter),
+		AnchorOpts.VAlign(AlignStart),
+	)(content)
+}
+
 func Center(content app.Scene) *Anchor {
 	return NewAnchor(
 		AnchorOpts.HAlign(AlignCenter),

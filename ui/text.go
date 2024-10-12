@@ -18,6 +18,9 @@ type Text struct {
 	face        text.Face
 	color       color.Color
 	padding     app.Space
+	alpha       float64
+
+	getFn func() string
 }
 
 func (u *Text) SetColor(clr color.Color) {
@@ -59,6 +62,10 @@ func (u *Text) Draw(screen *ebiten.Image) {
 		op.ColorScale.ScaleWithColor(clr)
 	}
 
+	if a := u.alpha; a != 1 {
+		op.ColorScale.ScaleAlpha(float32(a))
+	}
+
 	var p = u.Bounds().Min.Add(u.padding.TopLeft())
 	op.GeoM.Translate(
 		float64(p.X),
@@ -66,6 +73,15 @@ func (u *Text) Draw(screen *ebiten.Image) {
 	)
 
 	text.Draw(screen, u.textContent, u.face, op)
+}
+
+func (u *Text) Update() error {
+	if fn := u.getFn; fn != nil {
+		var s = u.getFn()
+		u.SetContent(s)
+	}
+
+	return u.Scene.Update()
 }
 
 type TextOpt func(text *Text)
@@ -103,9 +119,16 @@ func (TextOptions) FontFace(face font.Face) TextOpt {
 	}
 }
 
+func (TextOptions) Pull(fn func() string) TextOpt {
+	return func(text *Text) {
+		text.getFn = fn
+	}
+}
+
 func NewText(opts ...TextOpt) *Text {
 	var text = &Text{
-		face: text.NewGoXFace(bitmapfont.FaceSC),
+		face:  text.NewGoXFace(bitmapfont.FaceSC),
+		alpha: 1.0,
 	}
 	for _, o := range opts {
 		o(text)
