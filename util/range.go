@@ -1,6 +1,8 @@
 package util
 
-import "cmp"
+import (
+	"cmp"
+)
 
 // a > 0
 // a   => [0, a) 0, 1, 2, ..., a - 1
@@ -45,4 +47,22 @@ func Map[A, B any](a []A, fn func(A) B) (r []B) {
 	}
 
 	return
+}
+
+func OR[T any](flag bool, a, b T) T {
+	if flag {
+		return a
+	}
+
+	return b
+}
+
+func NotZero[T ~int | ~float64](items ...T) T {
+	for _, n := range items {
+		if n != T(0) {
+			return n
+		}
+	}
+
+	return T(0)
 }
