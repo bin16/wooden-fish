@@ -7,10 +7,12 @@ import (
 	"github.com/bin16/wooden-fish/assets"
 	"github.com/bin16/wooden-fish/ui"
 	"github.com/bin16/wooden-fish/util"
+	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/audio/vorbis"
+	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
 
-func NewAuto() app.Scene {
+func NewFreeMode() app.Scene {
 	var title = ui.NewText(
 		ui.TextOpts.Content("功德+1"),
 	)
@@ -18,8 +20,7 @@ func NewAuto() app.Scene {
 	var anim = ui.NewAnim(
 		ui.AnimOpts.NewImageFromBytes(assets.DefaultAnimSheetBytes),
 		ui.AnimOpts.Size(32, 32),
-		ui.AnimOpts.AutoPlay(true),
-		ui.AnimOpts.Loop(true),
+		ui.AnimOpts.FPS(30),
 		ui.AnimOpts.OnFrame(5, func() {
 			var s, _ = vorbis.DecodeF32(bytes.NewReader(assets.DefaultSoundBytes))
 			var ply, _ = util.AudioContext.NewPlayerF32(s)
@@ -35,12 +36,25 @@ func NewAuto() app.Scene {
 		),
 	)
 
-	var main = ui.NewWindow(
-		ui.WinOpts.Contents(
+	var page = ui.NewPage(
+		ui.PageOpts.Fill(app.Theme.BackgroundColor),
+		ui.PageOpts.OnInput(func() bool {
+			if inpututil.IsKeyJustPressed(ebiten.KeyEnter) {
+				anim.Play()
+				return true
+			}
 
+			if inpututil.IsKeyJustPressed(ebiten.KeyEscape) {
+				app.Load(MainMenu())
+				return true
+			}
+
+			return false
+		}),
+		ui.PageOpts.Contents(
 			box,
 		),
 	)
 
-	return main
+	return page
 }

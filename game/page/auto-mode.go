@@ -12,7 +12,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
 
-func NewFree() app.Scene {
+func NewAutoMode() app.Scene {
 	var title = ui.NewText(
 		ui.TextOpts.Content("功德+1"),
 	)
@@ -20,7 +20,8 @@ func NewFree() app.Scene {
 	var anim = ui.NewAnim(
 		ui.AnimOpts.NewImageFromBytes(assets.DefaultAnimSheetBytes),
 		ui.AnimOpts.Size(32, 32),
-		ui.AnimOpts.FPS(30),
+		ui.AnimOpts.AutoPlay(true),
+		ui.AnimOpts.Loop(true),
 		ui.AnimOpts.OnFrame(5, func() {
 			var s, _ = vorbis.DecodeF32(bytes.NewReader(assets.DefaultSoundBytes))
 			var ply, _ = util.AudioContext.NewPlayerF32(s)
@@ -36,19 +37,20 @@ func NewFree() app.Scene {
 		),
 	)
 
-	var main = ui.NewWindow(
-		ui.WinOpts.OnInput(func() bool {
-			if inpututil.IsKeyJustPressed(ebiten.KeyEnter) {
-				anim.Play()
+	var page = ui.NewPage(
+		ui.PageOpts.Fill(app.Theme.BackgroundColor),
+		ui.PageOpts.OnInput(func() bool {
+			if inpututil.IsKeyJustPressed(ebiten.KeyEscape) {
+				app.Load(MainMenu())
 				return true
 			}
 
 			return false
 		}),
-		ui.WinOpts.Contents(
+		ui.PageOpts.Contents(
 			box,
 		),
 	)
 
-	return main
+	return page
 }

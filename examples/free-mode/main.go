@@ -14,7 +14,6 @@ import (
 func main() {
 	var game = app.New(
 		app.Options.OnInput(func() bool {
-
 			if inpututil.IsKeyJustPressed(ebiten.KeyQ) {
 				app.Quit()
 				return true
@@ -24,7 +23,7 @@ func main() {
 		}),
 	)
 
-	game.Load(page.NewAuto())
+	game.Load(page.NewFreeMode())
 
 	ebiten.SetWindowPosition(200, 200)
 	ebiten.SetWindowIcon(
