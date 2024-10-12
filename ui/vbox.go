@@ -18,10 +18,16 @@ const (
 type VBox struct {
 	Box
 
-	alignItems AlignItems
+	alignItems     AlignItems
+	justifyContent JustifyContent
 }
 
 func (u *VBox) Layout(ow, oh int) (bw, bh int) {
+	var (
+		cw int
+		ch int
+	)
+
 	if d := len(u.children); len(u.sr) != d {
 		u.sr = make([]image.Rectangle, d)
 	}
@@ -29,12 +35,19 @@ func (u *VBox) Layout(ow, oh int) (bw, bh int) {
 		var (
 			w, h = n.Layout(ow, oh)
 			x    = 0
-			y    = bh
+			y    = ch
 		)
-		bw = max(bw, w)
-		bh = bh + h
+		cw = max(cw, w)
+		ch = ch + h
 
 		u.sr[i] = image.Rect(0, 0, w, h).Add(image.Pt(x, y))
+	}
+	u.cr = image.Rect(0, 0, cw, ch)
+
+	bw = cw
+	bh = ch
+	if u.justifyContent != JustifyStart {
+		bh = oh
 	}
 
 	return
@@ -43,16 +56,44 @@ func (u *VBox) Layout(ow, oh int) (bw, bh int) {
 func (u *VBox) SetBounds(r image.Rectangle) {
 	u.Scene.SetBounds(r)
 
+	var (
+		cnt = len(u.Children())
+		sp  = r.Dy() - u.cr.Dy()
+		z0  = 0
+		z   = 0
+	)
+	switch u.justifyContent {
+	case JustifyCenter:
+		z0 = sp / 2
+	case JustifyEnd:
+		z0 = sp
+	case SpaceBetween:
+		if cnt == 1 {
+			z = sp / 2
+		} else {
+			z = sp / (cnt - 1)
+		}
+	}
+
 	for i, n := range u.children {
-		var x = 0
+		var (
+			r1 = u.sr[i]
+			x  = 0
+			y  = r1.Min.Y + z0 + z*i
+			w  = r1.Dx()
+			h  = r1.Dy()
+		)
+
 		switch u.alignItems {
 		case AlignCenter:
 			x = (r.Dx() - u.sr[i].Dx()) / 2
 		case AlignEnd:
 			x = (r.Dx() - u.sr[i].Dx())
+		case AlignStretch:
+			w = r.Dx()
 		}
 
-		n.SetBounds(u.sr[i].Add(r.Min).Add(image.Pt(x, 0)))
+		n.SetBounds(image.Rect(0, 0, w, h).Add(image.Pt(x, y)).Add(r.Min))
 	}
 }
 
@@ -64,6 +105,12 @@ var VBoxOpts VBoxOptions
 func (VBoxOptions) AlignItems(d AlignItems) VBoxOpt {
 	return func(box *VBox) {
 		box.alignItems = d
+	}
+}
+
+func (VBoxOptions) JustifyContent(d JustifyContent) VBoxOpt {
+	return func(box *VBox) {
+		box.justifyContent = d
 	}
 }
 
