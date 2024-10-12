@@ -2,7 +2,7 @@ package curve
 
 import "image/color"
 
-func Apply[T ~int | ~float64](q float64, a, b T) T {
+func Apply[T int | float32 | float64](q float64, a, b T) T {
 	if q == 0 {
 		return a
 	}
