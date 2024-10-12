@@ -12,6 +12,7 @@ const (
 	AlignStart AlignItems = iota
 	AlignCenter
 	AlignEnd
+	AlignStretch
 )
 
 type VBox struct {
