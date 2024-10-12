@@ -1,58 +1,43 @@
 package app
 
 import (
+	"errors"
 	"image"
-	"image/color"
+	"math"
 
+	"github.com/bin16/wooden-fish/animator/curve"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
 
 type App struct {
-	layers  []Scene
+	stack Stack
+
 	uiScale float64
-	quit    bool
 	onInput []func() bool
 
 	drag0 image.Point
 	drag  bool
+
+	errors []error
 }
 
-func (u *App) Layout(ow, oh int) (bw, bh int) {
-	var (
-		uiScale = 2
-		cw      = ow / uiScale
-		ch      = oh / uiScale
-	)
+func (app *App) Layout(ow, oh int) (bw, bh int) {
+	var w, h = app.CanvasSize()
 
-	for _, scene := range u.layers {
-		scene.Layout(cw, ch)
-		scene.SetBounds(image.Rect(0, 0, cw, ch))
-	}
+	return app.stack.Layout(w, h)
+}
 
-	return cw, ch
+func (app *App) CanvasSize() (w, h int) {
+	var scale = app.uiScale
+	var ow, oh = ebiten.WindowSize()
+	w = int(math.Round(float64(ow) / scale))
+	h = int(math.Round(float64(oh) / scale))
+	return
 }
 
 func (u *App) Draw(screen *ebiten.Image) {
-	screen.Fill(color.White)
-	for _, n := range u.layers {
-		n.Draw(screen)
-	}
-}
-
-func (u *App) HandleInput() bool {
-	for _, fn := range u.onInput {
-		if fn() {
-			return true
-		}
-	}
-
-	var cnt = len(u.layers)
-	if cnt < 1 {
-		return false
-	}
-
-	return u.layers[cnt-1].HandleInput()
+	u.stack.Draw(screen)
 }
 
 func (u *App) HandleDrag() bool {
@@ -80,29 +65,47 @@ func (u *App) HandleDrag() bool {
 }
 
 func (u *App) Update() error {
-	u.HandleInput()
-	u.HandleDrag()
-
-	if u.quit {
-		return ebiten.Termination
+	for _, err := range app.errors {
+		if errors.Is(err, ebiten.Termination) {
+			return ebiten.Termination
+		}
 	}
 
-	var cnt = len(u.layers)
-	if cnt > 0 {
-		return u.layers[cnt-1].Update()
+	if err := curve.Update(); err != nil {
+		return err
+	}
+
+	u.stack.HandleInput()
+	u.HandleDrag()
+	if err := app.stack.Update(); err != nil {
+		return err
 	}
 
 	return nil
 }
 
-func (u *App) Load(scene Scene) {
-	if len(u.layers) == 0 {
-		u.layers = append(u.layers, scene)
-	} else {
-		u.layers[len(u.layers)-1] = scene
+func (app *App) Push(p Scene) {
+	app.stack.Push(p)
+}
+
+func (app *App) Pop() {
+	app.stack.Pop()
+}
+
+func (app *App) Load(p Scene) {
+	app.stack.Load(p)
+}
+
+func (app *App) Preload(p Scene) {
+	go app.loadScene(p)
+}
+
+func (app *App) loadScene(p Scene) {
+	if err := p.Load(); err != nil {
+		app.errors = append(app.errors, err)
 	}
 }
 
 func (u *App) Quit() {
-	u.quit = true
+	u.errors = append(u.errors, ebiten.Termination)
 }

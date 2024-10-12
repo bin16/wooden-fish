@@ -4,6 +4,10 @@ func Quit() {
 	app.Quit()
 }
 
-func Load(scene Scene) {
-	app.Load(scene)
+func Load(p Scene) {
+	app.Load(p)
+}
+
+func Push(p Scene) {
+	app.Push(p)
 }

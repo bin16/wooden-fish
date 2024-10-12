@@ -35,6 +35,10 @@ type Scene interface {
 
 	HandleEnter() bool
 	HandleExit() bool
+
+	Load() error
+	Loaded() bool
+	Unload() error
 }
 
 type Box interface {
