@@ -38,3 +38,11 @@ func Range[T cmp.Ordered](a T, b ...T) (r []T) {
 
 	return
 }
+
+func Map[A, B any](a []A, fn func(A) B) (r []B) {
+	for _, n := range a {
+		r = append(r, fn(n))
+	}
+
+	return
+}
