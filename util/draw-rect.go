@@ -77,15 +77,15 @@ func DrawRect(screen *ebiten.Image, dr image.Rectangle, opts ...DrawRectOpt) {
 
 	if clr := op.backgroundColor; clr != nil {
 		screen.SubImage(
-			image.Rect(0, rad, dr.Dx(), dr.Dy()-rad),
+			image.Rect(0, rad, dr.Dx(), dr.Dy()-rad).Add(dr.Min),
 		).(*ebiten.Image).Fill(clr)
 		for i := 0; i < rad; i++ {
 			var d = dl[rad][i]
 			screen.SubImage(
-				image.Rect(d, i, dr.Dx()-d, i+1),
+				image.Rect(d, i, dr.Dx()-d, i+1).Add(dr.Min),
 			).(*ebiten.Image).Fill(clr)
 			screen.SubImage(
-				image.Rect(d, dr.Dy()-i-1, dr.Dx()-d, dr.Dy()-i),
+				image.Rect(d, dr.Dy()-i-1, dr.Dx()-d, dr.Dy()-i).Add(dr.Min),
 			).(*ebiten.Image).Fill(clr)
 		}
 	}

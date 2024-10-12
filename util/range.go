@@ -12,7 +12,7 @@ func Range[T cmp.Ordered](a T, b ...T) (r []T) {
 		high = T(a)
 		step = T(1)
 	)
-	if len(b) == 1 {
+	if len(b) > 0 {
 		low = a
 		high = b[0]
 	}

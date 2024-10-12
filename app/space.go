@@ -1,6 +1,8 @@
 package app
 
-import "image"
+import (
+	"image"
+)
 
 type Space struct {
 	Top, Right, Bottom, Left int
@@ -16,6 +18,10 @@ func (sp Space) Y() int {
 
 func (sp Space) TopLeft() image.Point {
 	return image.Pt(sp.Left, sp.Top)
+}
+
+func (sp Space) Pt() image.Point {
+	return sp.TopLeft()
 }
 
 func NewSpace(num ...int) Space {
