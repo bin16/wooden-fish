@@ -14,7 +14,6 @@ import (
 func main() {
 	var game = app.New(
 		app.Options.OnInput(func() bool {
-
 			if inpututil.IsKeyJustPressed(ebiten.KeyQ) {
 				app.Quit()
 				return true
