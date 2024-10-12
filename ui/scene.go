@@ -163,3 +163,15 @@ func (u *Scene) HandleEnter() bool {
 func (u *Scene) HandleExit() bool {
 	return false
 }
+
+func (u *Scene) Load() error {
+	return nil
+}
+
+func (u *Scene) Unload() error {
+	return nil
+}
+
+func (u *Scene) Loaded() bool {
+	return true
+}

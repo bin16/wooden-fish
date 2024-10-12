@@ -2,10 +2,26 @@ package ui
 
 import (
 	"image/color"
+	"time"
 
+	"github.com/bin16/wooden-fish/animator/curve"
 	"github.com/bin16/wooden-fish/app"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
+)
+
+type PageStatus uint8
+
+const (
+	PageLoading PageStatus = iota
+	PageLoaded
+	PageUnloading
+	PageUnloaded
+	// TODO:
+	PageAnimIn
+	PageAnimInDone
+	PageAnimOut
+	PageAnimOutDone
 )
 
 type Page struct {
@@ -15,6 +31,11 @@ type Page struct {
 
 	text    *Text
 	onInput []func() bool
+
+	status   PageStatus
+	curve    *curve.Curve
+	cache    *ebiten.Image
+	duration time.Duration
 }
 
 func (u *Page) HandleInput() bool {
@@ -76,21 +97,86 @@ func (u *Page) HandleInput() bool {
 }
 
 func (u *Page) Draw(screen *ebiten.Image) {
-	// util.DrawRect(
-	// 	screen,
-	// 	u.bounds,
-	// 	util.DrawRectOpts.StrokeWidth(1),
-	// 	util.DrawRectOpts.Color(hexcolor.New("#F6F7EB")),
-	// 	util.DrawRectOpts.Radius(2),
-	// 	util.DrawRectOpts.Fill(hexcolor.New("#5C415D")),
-	// )
-
-	if clr := u.backgroundColor; clr != nil {
-		screen.SubImage(u.Bounds()).(*ebiten.Image).Fill(clr)
-		// screen.Fill(color.Black)
+	if u.cache == nil || u.cache.Bounds() != screen.Bounds() {
+		u.cache = ebiten.NewImage(
+			screen.Bounds().Dx(),
+			screen.Bounds().Dy(),
+		)
 	}
 
-	u.Box.Draw(screen)
+	u.cache.Clear()
+
+	if clr := u.backgroundColor; clr != nil {
+		u.cache.Fill(clr)
+	}
+
+	u.Box.Draw(u.cache)
+
+	var op = &ebiten.DrawImageOptions{}
+	// op.GeoM.Translate(
+	// 	float64(u.Bounds().Min.X),
+	// 	float64(u.Bounds().Min.Y),
+	// )
+
+	if u.curve != nil {
+		var alpha = curve.Apply(u.curve.Q(), 0.0, 1.0)
+		if alpha != 1 {
+			op.ColorScale.ScaleAlpha(float32(alpha))
+		}
+	}
+
+	screen.DrawImage(u.cache, op)
+}
+
+func (u *Page) AnimIn() {
+	u.curve = curve.NewCurve(
+		curve.CurveOpts.AutoPlay(),
+		curve.CurveOpts.Duration(u.duration),
+		curve.CurveOpts.OnEnd(func(curve *curve.Curve) {
+			u.status = PageAnimInDone
+		}),
+	)
+
+	u.status = PageAnimIn
+}
+
+func (u *Page) AnimOut() {
+	u.status = PageAnimOut
+	u.curve = curve.NewCurve(
+		curve.CurveOpts.AutoPlay(),
+		curve.CurveOpts.Reversed(),
+		curve.CurveOpts.Duration(u.duration),
+		curve.CurveOpts.OnEnd(func(curve *curve.Curve) {
+			u.status = PageAnimOutDone
+		}),
+	)
+}
+
+func (u *Page) Load() error {
+	u.status = PageLoading
+	if err := u.Box.Load(); err != nil {
+		return err
+	}
+
+	u.status = PageLoaded
+
+	u.AnimIn()
+
+	return nil
+}
+
+func (u *Page) Unload() error {
+	u.status = PageUnloading
+
+	u.AnimOut()
+	u.curve.Wait()
+
+	if err := u.Box.Unload(); err != nil {
+		return err
+	}
+
+	u.status = PageUnloaded
+	return nil
 }
 
 type PageOpt func(page *Page)
@@ -118,6 +204,7 @@ func (PageOptions) Fill(clr color.Color) PageOpt {
 
 func NewPage(opts ...PageOpt) *Page {
 	var page = &Page{
+		duration: time.Second / 4,
 		text: NewText(
 			TextOpts.Content("功德+1"),
 		),
