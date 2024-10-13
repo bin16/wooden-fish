@@ -70,7 +70,8 @@ func (u *Box) FocusPrev() bool {
 		cnt = len(u.children)
 		k   = cnt
 	)
-	for i, n := range u.children {
+	for i := range u.children {
+		var n = u.Child(cnt - 1 - i)
 		if n.HasFocus() {
 			k = i
 			if n.FocusPrev() {
@@ -104,7 +105,8 @@ func (u *Box) FocusLeft() bool {
 		cnt = len(u.children)
 		k   = cnt
 	)
-	for i, n := range u.children {
+	for i := range u.children {
+		var n = u.Child(cnt - 1 - i)
 		if n.HasFocus() {
 			k = i
 			if n.FocusLeft() {
@@ -138,7 +140,8 @@ func (u *Box) FocusUp() bool {
 		cnt = len(u.children)
 		k   = cnt
 	)
-	for i, n := range u.children {
+	for i := range u.children {
+		var n = u.Child(cnt - 1 - i)
 		if n.HasFocus() {
 			k = i
 			if n.FocusUp() {

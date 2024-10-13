@@ -14,13 +14,16 @@ func NewSettings() *ui.Page {
 		ui.MenuOpts.TextItem(i18n.T(i18n.Language), func() {
 			app.Load(NewLangMenu())
 		}),
-		ui.MenuOpts.TextItem(i18n.T(i18n.Back), func() {
-			app.Load(MainMenu())
-		}),
+		// ui.MenuOpts.TextItem(i18n.T(i18n.Back), func() {
+		// 	app.Load(MainMenu())
+		// }),
 		ui.MenuOpts.OnExit(func() {
 			app.Load(MainMenu())
 		}),
 	)
+	ui.MenuOpts.TextItem(i18n.T(i18n.Back), func() {
+		app.Load(MainMenu())
+	}, ui.TextOpts.Color(app.Theme.SecondaryColor))(menu)
 
 	var title = ui.NewText(
 		ui.TextOpts.Content(i18n.T(i18n.Settings)),

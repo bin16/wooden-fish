@@ -51,16 +51,24 @@ func (u *Menu) HandleMouseInput() bool {
 	return false
 }
 
-func (u *Menu) HandleFocus(i int) bool {
-	if i < 0 {
+func (u *Menu) HandleFocus(k int) bool {
+	if k < 0 {
 		return false
 	}
 
-	if i > len(u.children)-1 {
+	if k > len(u.children)-1 {
 		return false
 	}
 
-	u.activeIndex = i
+	u.activeIndex = k
+	for i, n := range u.Children() {
+		if i == k {
+			n.Focus()
+		} else {
+			n.Blur()
+		}
+	}
+
 	return true
 }
 
@@ -77,11 +85,34 @@ func (u *Menu) HasFocus() bool {
 }
 
 func (u *Menu) FocusUp() bool {
-	return u.HandleFocus(u.activeIndex - 1)
+	if !u.HasFocus() {
+		return u.HandleFocus(len(u.Children()) - 1)
+	}
+
+	if u.HandleFocus(u.activeIndex - 1) {
+		return true
+	}
+
+	u.Blur()
+	return false
 }
 
 func (u *Menu) FocusDown() bool {
-	return u.HandleFocus(u.activeIndex + 1)
+	if !u.HasFocus() {
+		return u.HandleFocus(0)
+	}
+
+	if u.HandleFocus(u.activeIndex + 1) {
+		return true
+	}
+
+	u.Blur()
+	return false
+}
+
+func (u *Menu) Blur() {
+	u.activeIndex = -1
+	u.Box.Blur()
 }
 
 func (u *Menu) FocusPrev() bool {
@@ -176,11 +207,14 @@ type MenuOptions struct{}
 
 var MenuOpts MenuOptions
 
-func (MenuOptions) TextItem(s string, onEnter func()) MenuOpt {
+func (MenuOptions) TextItem(s string, onEnter func(), opts ...TextOpt) MenuOpt {
 	var item = NewText(
 		TextOpts.Padding(1, 4),
 		TextOpts.Content(s),
 	)
+	for _, o := range opts {
+		o(item)
+	}
 
 	return func(menu *Menu) {
 		var k = len(menu.children)

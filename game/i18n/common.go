@@ -6,6 +6,16 @@ import (
 	"golang.org/x/text/message"
 )
 
+type LangOptions struct {
+	Name string
+	Tag  language.Tag
+}
+
+var Options = []LangOptions{
+	{"中文", SC},
+	{"English", EN},
+}
+
 var (
 	FreeMode   = "Free Mode"
 	AutoMode   = "Auto Mode"

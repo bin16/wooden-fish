@@ -7,25 +7,29 @@ import (
 	"github.com/bin16/wooden-fish/ui"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
-	"golang.org/x/text/language"
 )
 
 func NewLangMenu() *ui.Page {
 	var menu = ui.NewMenu(
-		ui.MenuOpts.TextItem("中文", func() {
-			game.Game.Language = language.SimplifiedChinese
-			game.Save()
-			app.Load(NewSettings())
-		}),
-		ui.MenuOpts.TextItem("English", func() {
-			game.Game.Language = language.English
-			game.Save()
-			app.Load(NewSettings())
-		}),
 		ui.MenuOpts.OnExit(func() {
 			app.Load(NewSettings())
 		}),
 	)
+	for i, lang := range i18n.Options {
+		var o = ui.MenuOpts.TextItem(lang.Name, func() {
+			game.Game.Language = lang.Tag
+			game.Save()
+			app.Load(NewSettings())
+		})
+		o(menu)
+
+		if lang.Tag == game.Game.Language {
+			menu.HandleFocus(i)
+		}
+	}
+	ui.MenuOpts.TextItem(i18n.T(i18n.Back), func() {
+		app.Load(NewSettings())
+	}, ui.TextOpts.Color(app.Theme.SecondaryColor))(menu)
 
 	var title = ui.NewText(
 		ui.TextOpts.Content(i18n.T(i18n.Language)),
