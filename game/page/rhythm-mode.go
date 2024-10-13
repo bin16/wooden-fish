@@ -116,6 +116,11 @@ func NewRaythm() *ui.Page {
 				return true
 			}
 
+			if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
+				playSound()
+				return true
+			}
+
 			if inpututil.IsKeyJustPressed(ebiten.KeyEscape) {
 				app.Load(MainMenu())
 				return true

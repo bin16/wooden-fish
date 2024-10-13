@@ -91,6 +91,11 @@ func NewFreeMode() app.Scene {
 				return true
 			}
 
+			if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
+				anim.Play()
+				return true
+			}
+
 			if inpututil.IsKeyJustPressed(ebiten.KeyEscape) {
 				app.Load(MainMenu())
 				return true

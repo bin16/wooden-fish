@@ -4,6 +4,8 @@ import (
 	"github.com/bin16/wooden-fish/app"
 	"github.com/bin16/wooden-fish/game/i18n"
 	"github.com/bin16/wooden-fish/ui"
+	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
 
 func NewSettings() *ui.Page {
@@ -39,6 +41,14 @@ func NewSettings() *ui.Page {
 		ui.PageOpts.Contents(
 			ui.Center(box),
 		),
+		ui.PageOpts.OnInput(func() bool {
+			if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonRight) {
+				app.Load(MainMenu())
+				return true
+			}
+
+			return false
+		}),
 	)
 
 	return page

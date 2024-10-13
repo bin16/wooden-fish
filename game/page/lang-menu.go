@@ -5,6 +5,8 @@ import (
 	"github.com/bin16/wooden-fish/game"
 	"github.com/bin16/wooden-fish/game/i18n"
 	"github.com/bin16/wooden-fish/ui"
+	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"golang.org/x/text/language"
 )
 
@@ -44,6 +46,14 @@ func NewLangMenu() *ui.Page {
 		ui.PageOpts.Contents(
 			ui.Center(box),
 		),
+		ui.PageOpts.OnInput(func() bool {
+			if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonRight) {
+				app.Load(MainMenu())
+				return true
+			}
+
+			return false
+		}),
 	)
 
 	return page

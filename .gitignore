@@ -2,3 +2,5 @@
 *.save.json
 build/
 build.ps1
+dist/
+scripts/
