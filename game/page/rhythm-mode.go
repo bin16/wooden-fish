@@ -74,13 +74,15 @@ func NewRaythm() *ui.Page {
 	})
 
 	var main = ui.Center(
-		ui.NewVBox(
+		ui.OnTap(ui.NewVBox(
 			ui.VBoxOpts.AlignItems(ui.AlignCenter),
 			ui.VBoxOpts.Contents(
 				title,
 				anim,
 			),
-		),
+		), func(data ...any) {
+			playSound()
+		}),
 	)
 
 	var p = ui.NewSpace(ui.SpaceOpts.Space(4))
