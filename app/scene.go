@@ -14,6 +14,7 @@ type Scene interface {
 	Bounds() (r image.Rectangle)
 	HandleInput() bool
 	HandleMouseInput() bool
+	HandleTouchInput() bool
 	HasFocus() bool
 	IsFocusable() bool
 	IsFocused() bool

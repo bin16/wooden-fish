@@ -39,6 +39,10 @@ func (u *Scene) HandleMouseInput() bool {
 	return false
 }
 
+func (u *Scene) HandleTouchInput() bool {
+	return false
+}
+
 func (u *Scene) HasFocus() bool {
 	return u.IsFocused()
 }

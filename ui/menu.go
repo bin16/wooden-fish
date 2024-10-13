@@ -1,6 +1,7 @@
 package ui
 
 import (
+	"fmt"
 	"image"
 
 	"github.com/bin16/wooden-fish/app"
@@ -18,10 +19,28 @@ type Menu struct {
 	onExit  []func()
 }
 
+func (u *Menu) HandleTouchInput() bool {
+	for i, n := range u.children {
+		if u.HandleFocus(i) {
+			if app.IsTappedInBounds(n.Bounds()) {
+				if u.Enter() {
+					return true
+				}
+			}
+		}
+	}
+
+	return false
+}
+
 func (u *Menu) HandleMouseInput() bool {
 	var cursor = image.Pt(ebiten.CursorPosition())
 	if !cursor.In(u.Bounds()) {
 		return false
+	}
+
+	if inpututil.IsTouchJustReleased(ebiten.TouchID(0)) {
+		fmt.Println("touch!")
 	}
 
 	if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonRight) {

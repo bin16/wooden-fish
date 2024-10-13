@@ -35,6 +35,16 @@ func (u *Box) HandleMouseInput() bool {
 	return false
 }
 
+func (u *Box) HandleTouchInput() bool {
+	for _, n := range u.children {
+		if n.HandleTouchInput() {
+			return true
+		}
+	}
+
+	return false
+}
+
 func (u *Box) AddChild(n app.Scene) {
 	u.children = append(u.children, n)
 }

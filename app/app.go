@@ -68,6 +68,8 @@ func (u *App) HandleDrag() bool {
 }
 
 func (u *App) Update() error {
+	updateTouchState()
+
 	for _, err := range app.errors {
 		if errors.Is(err, ebiten.Termination) {
 			return ebiten.Termination
@@ -80,6 +82,7 @@ func (u *App) Update() error {
 
 	u.stack.HandleInput()
 	u.stack.HandleMouseInput()
+	u.stack.HandleTouchInput()
 	u.HandleDrag()
 	if err := app.stack.Update(); err != nil {
 		return err

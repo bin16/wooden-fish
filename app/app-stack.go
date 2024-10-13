@@ -135,6 +135,14 @@ func (u *Stack) HandleMouseInput() bool {
 	return false
 }
 
+func (u *Stack) HandleTouchInput() bool {
+	if cnt := len(u.stack); cnt > 0 {
+		return u.stack[cnt-1].HandleTouchInput()
+	}
+
+	return false
+}
+
 func (u *Stack) loadScene(p Scene) {
 	if err := p.Load(); err != nil {
 		u.errors = append(u.errors, err)
