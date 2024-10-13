@@ -21,7 +21,7 @@ var (
 	//go:embed "sound.ogg"
 	sound_bytes []byte
 
-	//go:embed "wooden-fish-32x32-anim.png"
+	//go:embed "wooden-fish-48x48-sheet.png"
 	sheet_bytes []byte
 )
 

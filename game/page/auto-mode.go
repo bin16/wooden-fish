@@ -19,7 +19,7 @@ func NewAutoMode() app.Scene {
 
 	var anim = ui.NewAnim(
 		ui.AnimOpts.NewImageFromBytes(assets.DefaultAnimSheetBytes),
-		ui.AnimOpts.Size(32, 32),
+		ui.AnimOpts.Size(48, 48),
 		ui.AnimOpts.AutoPlay(true),
 		ui.AnimOpts.Loop(true),
 		ui.AnimOpts.OnFrame(5, func() {

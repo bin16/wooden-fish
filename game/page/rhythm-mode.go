@@ -24,7 +24,7 @@ func NewRaythm() *ui.Page {
 
 	var anim = ui.NewAnim(
 		ui.AnimOpts.NewImageFromBytes(assets.DefaultAnimSheetBytes),
-		ui.AnimOpts.Size(32, 32),
+		ui.AnimOpts.Size(48, 48),
 		ui.AnimOpts.FPS(6),
 		ui.AnimOpts.Loop(true),
 		ui.AnimOpts.AutoPlay(true),
