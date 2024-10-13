@@ -34,14 +34,18 @@ func (u *TapBox) HandleMouseInput() bool {
 		mousedown = mouseover && ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft)
 	)
 
+	if mouseover {
+		ebiten.SetCursorShape(ebiten.CursorShapePointer)
+	}
+
 	if mousedown && !u.mousedown {
 		u.events.Emit("mousedown")
+		u.events.Emit("press") // or click?
+		u.events.Emit("tap")
 	}
 
 	if !mousedown && mousedown {
 		u.events.Emit("mouseup")
-		u.events.Emit("press") // or click?
-		u.events.Emit("tap")
 	}
 
 	if mouseover && !u.mouseover {
@@ -52,6 +56,10 @@ func (u *TapBox) HandleMouseInput() bool {
 		u.events.Emit("mouseleave")
 	}
 
+	u.mousedown = mousedown
+	u.mouseover = mouseover
+
+	// TODO: return true from Emit;
 	return false
 }
 
