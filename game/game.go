@@ -5,6 +5,8 @@ import (
 	"golang.org/x/text/language"
 )
 
+var Version string = "v0.0.0"
+
 type game struct {
 	Count    int          `json:"count"`
 	Language language.Tag `json:"lang"`

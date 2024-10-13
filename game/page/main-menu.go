@@ -2,6 +2,7 @@ package page
 
 import (
 	"github.com/bin16/wooden-fish/app"
+	"github.com/bin16/wooden-fish/game"
 	"github.com/bin16/wooden-fish/game/i18n"
 	"github.com/bin16/wooden-fish/ui"
 )
@@ -57,7 +58,7 @@ func MainMenu() *ui.Page {
 func NewVersionInfo() *ui.Anchor {
 	return ui.BottomLeft(ui.NewText(
 		ui.TextOpts.Color(app.Theme.SecondaryColor),
-		ui.TextOpts.Content("v0.5.0"),
+		ui.TextOpts.Content(game.Version),
 		ui.TextOpts.Padding(4),
 	))
 }
