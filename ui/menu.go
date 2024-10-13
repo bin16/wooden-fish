@@ -1,9 +1,12 @@
 package ui
 
 import (
+	"image"
+
 	"github.com/bin16/wooden-fish/app"
 	"github.com/bin16/wooden-fish/util"
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
 
 type Menu struct {
@@ -13,6 +16,39 @@ type Menu struct {
 
 	onEnter map[int][]func()
 	onExit  []func()
+}
+
+func (u *Menu) HandleMouseInput() bool {
+	var cursor = image.Pt(ebiten.CursorPosition())
+	if !cursor.In(u.Bounds()) {
+		return false
+	}
+
+	if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonRight) {
+		if u.Exit() {
+			return true
+		}
+	}
+
+	for i, n := range u.Children() {
+
+		if cursor.In(n.Bounds()) {
+			if u.HandleFocus(i) {
+				ebiten.SetCursorShape(ebiten.CursorShapePointer)
+
+				if inpututil.IsMouseButtonJustPressed(ebiten.MouseButton0) {
+					if u.Enter() {
+						return true
+					}
+				}
+
+				return true
+			}
+		}
+
+	}
+
+	return false
 }
 
 func (u *Menu) HandleFocus(i int) bool {

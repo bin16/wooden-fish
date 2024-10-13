@@ -5,6 +5,7 @@ import (
 
 	"github.com/bin16/wooden-fish/app"
 	"github.com/bin16/wooden-fish/assets"
+	"github.com/bin16/wooden-fish/game/i18n"
 	"github.com/bin16/wooden-fish/game/page"
 	"github.com/hajimehoshi/ebiten/v2"
 )
@@ -17,7 +18,7 @@ func main() {
 	app.Load(page.MainMenu())
 
 	ebiten.SetWindowSize(320, 320)
-	ebiten.SetWindowTitle("demo")
+	ebiten.SetWindowTitle(i18n.T(i18n.APP_NAME))
 	ebiten.SetWindowIcon(
 		[]image.Image{
 			assets.Icon_32x32,

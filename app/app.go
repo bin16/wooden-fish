@@ -79,6 +79,7 @@ func (u *App) Update() error {
 	}
 
 	u.stack.HandleInput()
+	u.stack.HandleMouseInput()
 	u.HandleDrag()
 	if err := app.stack.Update(); err != nil {
 		return err

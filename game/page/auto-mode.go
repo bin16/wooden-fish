@@ -74,6 +74,11 @@ func NewAutoMode() app.Scene {
 				return true
 			}
 
+			if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonRight) {
+				app.Load(MainMenu())
+				return true
+			}
+
 			return false
 		}),
 		ui.PageOpts.Contents(

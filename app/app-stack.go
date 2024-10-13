@@ -127,6 +127,7 @@ func (u *Stack) HandleInput() bool {
 }
 
 func (u *Stack) HandleMouseInput() bool {
+	ebiten.SetCursorShape(ebiten.CursorShapeDefault)
 	if cnt := len(u.stack); cnt > 0 {
 		return u.stack[cnt-1].HandleMouseInput()
 	}

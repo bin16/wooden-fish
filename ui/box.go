@@ -27,7 +27,7 @@ func (u *Box) HandleInput() bool {
 
 func (u *Box) HandleMouseInput() bool {
 	for _, n := range u.children {
-		if n.HandleInput() {
+		if n.HandleMouseInput() {
 			return true
 		}
 	}
