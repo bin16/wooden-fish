@@ -5,10 +5,12 @@ import (
 	"log"
 	"os"
 	"path"
-	"syscall/js"
 )
 
 var DIR = "."
+
+var Read = osRead
+var Write = osWrite
 
 func init() {
 	if d, err := os.Getwd(); err != nil {
@@ -19,21 +21,13 @@ func init() {
 	}
 }
 
-func Read(name string, data any) error {
-	if DIR == "" {
-		return jsRead(name, data)
-	}
+// func Read(name string, data any) error {
+// 	return osRead(name, data)
+// }
 
-	return osRead(name, data)
-}
-
-func Write(name string, data any) error {
-	if DIR == "" {
-		return jsWrite(name, data)
-	}
-
-	return osWrite(name, data)
-}
+// func Write(name string, data any) error {
+// 	return osWrite(name, data)
+// }
 
 func osRead(name string, data any) error {
 	var filename = path.Join(DIR, name)
@@ -54,21 +48,4 @@ func osWrite(name string, data any) error {
 	}
 
 	return os.WriteFile(filename, raw, 0666)
-}
-
-func jsWrite(name string, data any) error {
-	raw, err := json.Marshal(data)
-	if err != nil {
-		return err
-	}
-
-	js.Global().Get("localStorage").Call("setItem", name, string(raw))
-	return nil
-}
-
-func jsRead(name string, data any) error {
-	var val = js.Global().Get("localStorage").Call("getItem", name)
-	var str = val.String()
-
-	return json.Unmarshal([]byte(str), data)
 }
