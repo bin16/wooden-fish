@@ -40,8 +40,9 @@ func NewFreeMode() app.Scene {
 					title,
 					anim,
 				),
-			), func(data ...any) {
+			), func(data ...any) bool {
 				anim.Play()
+				return true
 			},
 		),
 	)
@@ -54,12 +55,14 @@ func NewFreeMode() app.Scene {
 		),
 	)
 
-	var helpExit = NewBack(func(data ...any) {
+	var helpExit = NewBack(func(data ...any) bool {
 		app.Load(MainMenu())
+		return true
 	})
 
-	var helpEnter = NewEnter(func(data ...any) {
+	var helpEnter = NewEnter(func(data ...any) bool {
 		anim.Play()
+		return true
 	})
 
 	var p = ui.NewSpace(ui.SpaceOpts.Space(4))
@@ -92,7 +95,7 @@ func NewFreeMode() app.Scene {
 	return page
 }
 
-func NewBack(onTap func(data ...any)) *ui.Anchor {
+func NewBack(onTap app.EventFunc) *ui.Anchor {
 	var content = ui.NewHBox(
 		ui.HBoxOpts.Contents(
 			ui.NewText(
@@ -111,7 +114,7 @@ func NewBack(onTap func(data ...any)) *ui.Anchor {
 	)
 }
 
-func NewEnter(onTap func(data ...any)) *ui.Anchor {
+func NewEnter(onTap app.EventFunc) *ui.Anchor {
 	var main = ui.NewHBox(
 		ui.HBoxOpts.JustifyContent(ui.JustifyEnd),
 		ui.HBoxOpts.Contents(

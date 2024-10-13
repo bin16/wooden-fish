@@ -65,12 +65,14 @@ func NewRaythm() *ui.Page {
 		knocked = true
 	}
 
-	var helpExit = NewBack(func(data ...any) {
+	var helpExit = NewBack(func(data ...any) bool {
 		app.Load(MainMenu())
+		return true
 	})
 
-	var helpEnter = NewEnter(func(data ...any) {
+	var helpEnter = NewEnter(func(data ...any) bool {
 		playSound()
+		return true
 	})
 
 	var main = ui.Center(
@@ -80,8 +82,9 @@ func NewRaythm() *ui.Page {
 				title,
 				anim,
 			),
-		), func(data ...any) {
+		), func(data ...any) bool {
 			playSound()
+			return true
 		}),
 	)
 

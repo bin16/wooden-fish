@@ -51,8 +51,9 @@ func NewAutoMode() app.Scene {
 		),
 	)
 
-	var helpExit = NewBack(func(data ...any) {
+	var helpExit = NewBack(func(data ...any) bool {
 		app.Load(MainMenu())
+		return true
 	})
 
 	var p = ui.NewSpace(ui.SpaceOpts.Space(4))

@@ -66,3 +66,11 @@ func NotZero[T ~int | ~float64](items ...T) T {
 
 	return T(0)
 }
+
+func AnyOf(values ...bool) (r bool) {
+	for _, v := range values {
+		r = r || v
+	}
+
+	return
+}

@@ -1,7 +1,6 @@
 package app
 
 import (
-	"fmt"
 	"image"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -29,23 +28,6 @@ func updateTouchState() {
 
 	for _, id := range touchIDs {
 		touchInfo[id] = image.Pt(ebiten.TouchPosition(id))
-	}
-
-	for id, p := range prevTouchInfo {
-		if _, ok := touchInfo[id]; !ok {
-			fmt.Println(id, p, "release")
-		}
-	}
-
-	for id, p := range touchInfo {
-		if _, ok := prevTouchInfo[id]; !ok {
-			fmt.Println(id, p, "touch")
-		}
-	}
-
-	for _, id := range justReleasedTouchIDs {
-		var x, y = ebiten.TouchPosition(id)
-		fmt.Println(id, "just released", x, y)
 	}
 }
 

@@ -4,6 +4,7 @@ import (
 	"image"
 
 	"github.com/bin16/wooden-fish/app"
+	"github.com/bin16/wooden-fish/util"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
@@ -19,12 +20,15 @@ type TapBox struct {
 
 func (u *TapBox) HandleTouchInput() bool {
 	if app.IsTappedInBounds(u.bounds) {
-		u.events.Emit("touch")
-		u.events.Emit("tap")
-		return true
+		if util.AnyOf(
+			u.events.Emit("touch"),
+			u.events.Emit("tap"),
+		) {
+			return true
+		}
 	}
 
-	return app.IsTappedInBounds(u.bounds)
+	return false
 }
 
 func (u *TapBox) HandleMouseInput() bool {
@@ -32,6 +36,7 @@ func (u *TapBox) HandleMouseInput() bool {
 		p         = image.Pt(ebiten.CursorPosition())
 		mouseover = p.In(u.Bounds())
 		mousedown = mouseover && ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft)
+		flag      = false
 	)
 
 	if mouseover {
@@ -39,31 +44,30 @@ func (u *TapBox) HandleMouseInput() bool {
 	}
 
 	if mousedown && !u.mousedown {
-		u.events.Emit("mousedown")
-		u.events.Emit("press") // or click?
-		u.events.Emit("tap")
+		flag = flag || u.events.Emit("mousedown")
+		flag = flag || u.events.Emit("press") // or click?
+		flag = flag || u.events.Emit("tap")
 	}
 
 	if !mousedown && mousedown {
-		u.events.Emit("mouseup")
+		flag = flag || u.events.Emit("mouseup")
 	}
 
 	if mouseover && !u.mouseover {
-		u.events.Emit("mouseenter")
+		flag = flag || u.events.Emit("mouseenter")
 	}
 
 	if !mouseover && u.mouseover {
-		u.events.Emit("mouseleave")
+		flag = flag || u.events.Emit("mouseleave")
 	}
 
 	u.mousedown = mousedown
 	u.mouseover = mouseover
 
-	// TODO: return true from Emit;
-	return false
+	return flag
 }
 
-func (u *TapBox) OnTap(fn func(data ...any)) {
+func (u *TapBox) OnTap(fn app.EventFunc) {
 	u.events.On("tap", fn)
 }
 
@@ -78,7 +82,7 @@ func (TapBoxOptions) Content(n app.Scene) TapBoxOpt {
 	}
 }
 
-func (TapBoxOptions) OnTap(fn func(data ...any)) TapBoxOpt {
+func (TapBoxOptions) OnTap(fn app.EventFunc) TapBoxOpt {
 	return func(u *TapBox) {
 		u.OnTap(fn)
 	}
@@ -93,7 +97,7 @@ func NewTapBox(opts ...TapBoxOpt) *TapBox {
 	return box
 }
 
-func OnTap(content app.Scene, fn func(data ...any)) *TapBox {
+func OnTap(content app.Scene, fn app.EventFunc) *TapBox {
 	return NewTapBox(
 		TapBoxOpts.Content(content),
 		TapBoxOpts.OnTap(fn),
