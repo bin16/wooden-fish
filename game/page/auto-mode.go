@@ -51,20 +51,11 @@ func NewAutoMode() app.Scene {
 		),
 	)
 
-	var helpExit = ui.BottomLeft(
-		ui.NewHBox(
-			ui.HBoxOpts.Contents(
-				ui.NewText(
-					ui.TextOpts.Content("[Esc]"),
-					ui.TextOpts.Color(app.Theme.SecondaryColor),
-				),
-				ui.NewText(
-					ui.TextOpts.Content(i18n.T(i18n.Back)),
-					ui.TextOpts.Color(app.Theme.SecondaryColor),
-				),
-			),
-		),
-	)
+	var helpExit = NewBack(func(data ...any) {
+		app.Load(MainMenu())
+	})
+
+	var p = ui.NewSpace(ui.SpaceOpts.Space(4))
 
 	var page = ui.NewPage(
 		ui.PageOpts.Fill(app.Theme.BackgroundColor),
@@ -82,11 +73,11 @@ func NewAutoMode() app.Scene {
 			return false
 		}),
 		ui.PageOpts.Contents(
-			ui.Layers(
+			p(ui.Layers(
 				main,
 				helpExit,
 				statInfo,
-			),
+			)),
 		),
 	)
 

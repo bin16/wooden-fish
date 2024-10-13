@@ -28,6 +28,8 @@ func MainMenu() *ui.Page {
 
 	var version = NewVersionInfo()
 
+	var p = ui.NewSpace(ui.SpaceOpts.Space(4))
+
 	var title = ui.NewText(
 		ui.TextOpts.Color(app.Theme.SecondaryColor),
 		ui.TextOpts.Content(i18n.T(i18n.APP_NAME)),
@@ -45,10 +47,10 @@ func MainMenu() *ui.Page {
 	var page = ui.NewPage(
 		ui.PageOpts.Fill(app.Theme.BackgroundColor),
 		ui.PageOpts.Contents(
-			ui.Layers(
+			p(ui.Layers(
 				ui.Center(box),
 				version,
-			),
+			)),
 		),
 	)
 
@@ -59,6 +61,5 @@ func NewVersionInfo() *ui.Anchor {
 	return ui.BottomLeft(ui.NewText(
 		ui.TextOpts.Color(app.Theme.SecondaryColor),
 		ui.TextOpts.Content(game.Version),
-		ui.TextOpts.Padding(4),
 	))
 }

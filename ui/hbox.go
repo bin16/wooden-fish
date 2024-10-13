@@ -45,7 +45,7 @@ func (u *HBox) Layout(ow, oh int) (bw, bh int) {
 	}
 	u.cr = image.Rect(0, 0, cw, ch)
 
-	bw = ow
+	bw = cw
 	bh = ch
 	return
 }

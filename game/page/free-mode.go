@@ -33,12 +33,16 @@ func NewFreeMode() app.Scene {
 	)
 
 	var main = ui.Center(
-		ui.NewVBox(
-			ui.VBoxOpts.AlignItems(ui.AlignCenter),
-			ui.VBoxOpts.Contents(
-				title,
-				anim,
-			),
+		ui.OnTap(
+			ui.NewVBox(
+				ui.VBoxOpts.AlignItems(ui.AlignCenter),
+				ui.VBoxOpts.Contents(
+					title,
+					anim,
+				),
+			), func(data ...any) {
+				anim.Play()
+			},
 		),
 	)
 
@@ -50,36 +54,13 @@ func NewFreeMode() app.Scene {
 		),
 	)
 
-	var helpExit = ui.BottomLeft(
-		ui.NewHBox(
-			ui.HBoxOpts.Contents(
-				ui.NewText(
-					ui.TextOpts.Content("[Esc]"),
-					ui.TextOpts.Color(app.Theme.SecondaryColor),
-				),
-				ui.NewText(
-					ui.TextOpts.Content(i18n.T(i18n.Back)),
-					ui.TextOpts.Color(app.Theme.SecondaryColor),
-				),
-			),
-		),
-	)
+	var helpExit = NewBack(func(data ...any) {
+		app.Load(MainMenu())
+	})
 
-	var helpEnter = ui.BottomRight(
-		ui.NewHBox(
-			ui.HBoxOpts.JustifyContent(ui.JustifyEnd),
-			ui.HBoxOpts.Contents(
-				ui.NewText(
-					ui.TextOpts.Content("[Enter]"),
-					ui.TextOpts.Color(app.Theme.SecondaryColor),
-				),
-				ui.NewText(
-					ui.TextOpts.Content(i18n.T(i18n.Beat)),
-					ui.TextOpts.Color(app.Theme.SecondaryColor),
-				),
-			),
-		),
-	)
+	var helpEnter = NewEnter(func(data ...any) {
+		anim.Play()
+	})
 
 	var p = ui.NewSpace(ui.SpaceOpts.Space(4))
 
@@ -119,4 +100,43 @@ func NewFreeMode() app.Scene {
 	)
 
 	return page
+}
+
+func NewBack(onTap func(data ...any)) *ui.Anchor {
+	var content = ui.NewHBox(
+		ui.HBoxOpts.Contents(
+			ui.NewText(
+				ui.TextOpts.Content("[Esc]"),
+				ui.TextOpts.Color(app.Theme.SecondaryColor),
+			),
+			ui.NewText(
+				ui.TextOpts.Content(i18n.T(i18n.Back)),
+				ui.TextOpts.Color(app.Theme.SecondaryColor),
+			),
+		),
+	)
+
+	return ui.BottomLeft(
+		ui.OnTap(content, onTap),
+	)
+}
+
+func NewEnter(onTap func(data ...any)) *ui.Anchor {
+	var main = ui.NewHBox(
+		ui.HBoxOpts.JustifyContent(ui.JustifyEnd),
+		ui.HBoxOpts.Contents(
+			ui.NewText(
+				ui.TextOpts.Content("[Enter]"),
+				ui.TextOpts.Color(app.Theme.SecondaryColor),
+			),
+			ui.NewText(
+				ui.TextOpts.Content(i18n.T(i18n.Beat)),
+				ui.TextOpts.Color(app.Theme.SecondaryColor),
+			),
+		),
+	)
+
+	return ui.BottomRight(
+		ui.OnTap(main, onTap),
+	)
 }

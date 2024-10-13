@@ -65,36 +65,13 @@ func NewRaythm() *ui.Page {
 		knocked = true
 	}
 
-	var helpExit = ui.BottomLeft(
-		ui.NewHBox(
-			ui.HBoxOpts.Contents(
-				ui.NewText(
-					ui.TextOpts.Content("[Esc]"),
-					ui.TextOpts.Color(app.Theme.SecondaryColor),
-				),
-				ui.NewText(
-					ui.TextOpts.Content(i18n.T(i18n.Back)),
-					ui.TextOpts.Color(app.Theme.SecondaryColor),
-				),
-			),
-		),
-	)
+	var helpExit = NewBack(func(data ...any) {
+		app.Load(MainMenu())
+	})
 
-	var helpEnter = ui.BottomRight(
-		ui.NewHBox(
-			ui.HBoxOpts.JustifyContent(ui.JustifyEnd),
-			ui.HBoxOpts.Contents(
-				ui.NewText(
-					ui.TextOpts.Content("[Enter]"),
-					ui.TextOpts.Color(app.Theme.SecondaryColor),
-				),
-				ui.NewText(
-					ui.TextOpts.Content(i18n.T(i18n.Beat)),
-					ui.TextOpts.Color(app.Theme.SecondaryColor),
-				),
-			),
-		),
-	)
+	var helpEnter = NewEnter(func(data ...any) {
+		playSound()
+	})
 
 	var main = ui.Center(
 		ui.NewVBox(
