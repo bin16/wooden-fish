@@ -9,50 +9,21 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
 
-func NewThemeMenu() *ui.Page {
+func NewAnimMenu() *ui.Page {
 	var menu = ui.NewMenu(
 		ui.MenuOpts.OnExit(func() {
 			app.Load(NewSettings())
 		}),
 	)
-
-	var p = ui.NewSpace(ui.SpaceOpts.Space(2, 4))
-
-	for i, th := range app.ThemeOptions {
-		var pal = ui.NewPalette(
-			ui.PaletteOpts.Width(16),
-			ui.PaletteOpts.Height(16),
-			ui.PaletteOpts.BorderRadius(0),
-			ui.PaletteOpts.BorderColor(th.BackgroundColor),
-			ui.PaletteOpts.Colors(
-				th.BackgroundColor,
-				th.Color,
-				th.SecondaryColor,
-				th.AccentColor,
-			),
-		)
-
-		var text = ui.NewText(
-			ui.TextOpts.Content(i18n.T(th.Name)),
-			ui.TextOpts.Padding(0, 0, 0, 2),
-		)
-
-		var item = ui.NewHBox(
-			ui.HBoxOpts.AlignItems(ui.AlignCenter),
-			ui.HBoxOpts.Contents(
-				pal,
-				text,
-			),
-		)
-
-		ui.MenuOpts.Item(p(item), func() {
-			app.LoadTheme(th)
-			game.Game.ThemeID = th.ID
+	for i, anim := range game.AnimationOptions {
+		var o = ui.MenuOpts.TextItem(i18n.T(anim.Name), func() {
+			game.LoadAnim(anim)
 			game.Save()
-			app.Load(NewThemeMenu())
-		})(menu)
+			app.Load(MainMenu())
+		})
+		o(menu)
 
-		if th.ID == app.Theme.ID {
+		if anim.ID == game.Animation.ID {
 			menu.HandleFocus(i)
 		}
 	}
@@ -61,7 +32,7 @@ func NewThemeMenu() *ui.Page {
 	}, ui.TextOpts.Color(app.Theme.SecondaryColor))(menu)
 
 	var title = ui.NewText(
-		ui.TextOpts.Content(i18n.T(i18n.Theme)),
+		ui.TextOpts.Content(i18n.T(i18n.Animation)),
 		ui.TextOpts.Color(app.Theme.SecondaryColor),
 		ui.TextOpts.Padding(0, 0, 8, 0),
 	)

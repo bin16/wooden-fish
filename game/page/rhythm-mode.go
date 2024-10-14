@@ -1,8 +1,6 @@
 package page
 
 import (
-	"bytes"
-
 	"github.com/bin16/wooden-fish/app"
 	"github.com/bin16/wooden-fish/assets"
 	"github.com/bin16/wooden-fish/game"
@@ -10,7 +8,6 @@ import (
 	"github.com/bin16/wooden-fish/ui"
 	"github.com/bin16/wooden-fish/util"
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/audio/vorbis"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
 
@@ -18,51 +15,101 @@ func NewRaythm() *ui.Page {
 	var title = ui.NewUpper()
 
 	var (
-		activeFrame = 5
-		knocked     = false
+		// knocked = false
+		// knocked_flag = make([]bool, len(game.Animation.Sounds))
+		knocked_frame_index = -100
+		checked             = map[int]bool{}
 	)
 
 	var anim = ui.NewAnim(
-		ui.AnimOpts.NewImageFromBytes(assets.DefaultAnimSheetBytes),
-		ui.AnimOpts.Size(48, 48),
-		ui.AnimOpts.FPS(6),
-		ui.AnimOpts.Loop(true),
 		ui.AnimOpts.AutoPlay(true),
-		ui.AnimOpts.OnFrame(activeFrame, func() {
-			game.Tick()
-		}),
-		ui.AnchorOpts.OnEnd(func() {
-			if !knocked {
-				title.NewText(i18n.Miss)
-			}
-
-			knocked = false
-		}),
+		ui.AnimOpts.Loop(true),
+		ui.AnimOpts.Image(game.Animation.Image()),
+		ui.AnimOpts.Size(game.Animation.Size()),
+		ui.AnimOpts.FPS(util.NotZero(
+			game.Animation.RhythmMode.FPS,
+			game.Animation.FPS,
+			9,
+		)),
 	)
+	for _, sound := range game.Animation.Sounds {
+		ui.AnimOpts.OnFrame(sound.FrameIndex, func() {
+			game.Tick()
+		})(anim)
+	}
+	for _, sound := range game.Animation.Sounds {
+		var k = sound.FrameIndex
+		ui.AnimOpts.OnFrame(k+2, func() {
+			if !checked[k] {
+				title.NewText(i18n.Miss)
+				checked[k] = true
+			}
+		})(anim)
+	}
+	ui.AnchorOpts.OnEnd(func() {
+		var lastCheckPoint = -1
+		for _, s := range game.Animation.Sounds {
+			lastCheckPoint = max(s.FrameIndex)
+		}
 
-	var playSound = func() {
-		if knocked {
+		if !checked[lastCheckPoint] {
+			title.NewText(i18n.T(i18n.Miss))
+		}
+
+		knocked_frame_index = -999
+		checked = make(map[int]bool)
+	})(anim)
+
+	// var anim = ui.NewAnim(
+	// 	ui.AnimOpts.NewImageFromBytes(assets.DefaultAnimSheetBytes),
+	// 	ui.AnimOpts.Size(48, 48),
+	// 	ui.AnimOpts.FPS(6),
+	// 	ui.AnimOpts.Loop(true),
+	// 	ui.AnimOpts.AutoPlay(true),
+	// 	ui.AnimOpts.OnFrame(activeFrame, func() {
+	// 		game.Tick()
+	// 	}),
+	// 	ui.AnchorOpts.OnEnd(func() {
+	// 		if !knocked {
+	// 			title.NewText(i18n.Miss)
+	// 		}
+
+	// 		knocked = false
+	// 	}),
+	// )
+
+	var playSound = func(name string) {
+		var ply = assets.NewAudioPlayer(name)
+
+		ply.Play()
+	}
+
+	var handleBeat = func() {
+		var k = anim.FrameIndex()
+		if k-knocked_frame_index < 2 {
 			return
 		}
 
-		var s, _ = vorbis.DecodeF32(bytes.NewReader(assets.DefaultSoundBytes))
-		var ply, _ = util.AudioContext.NewPlayerF32(s)
+		for _, s := range game.Animation.Sounds {
+			var k1 = s.FrameIndex
+			var d = util.OR(k > k1, k-k1, k1-k)
 
-		var d = anim.FrameIndex() - activeFrame
-		if d < 0 {
-			d = -d
+			if d < 1 {
+				checked[k1] = true
+				title.NewText(i18n.T(i18n.Perfect))
+				playSound(s.Source)
+				return
+			}
+
+			if d < 2 {
+				checked[k1] = true
+				title.NewText(i18n.T(i18n.Good))
+				playSound(s.Source)
+				return
+			}
 		}
 
-		if d == 0 {
-			title.NewText(i18n.Perfect)
-		} else if d == 1 {
-			title.NewText(i18n.Good)
-		} else {
-			title.NewText(i18n.Miss)
-		}
-
-		ply.Play()
-		knocked = true
+		title.NewText(i18n.T(i18n.Miss))
 	}
 
 	var helpExit = NewBack(func(data ...any) bool {
@@ -71,7 +118,7 @@ func NewRaythm() *ui.Page {
 	})
 
 	var helpEnter = NewEnter(func(data ...any) bool {
-		playSound()
+		handleBeat()
 		return true
 	})
 
@@ -83,7 +130,7 @@ func NewRaythm() *ui.Page {
 				anim,
 			),
 		), func(data ...any) bool {
-			playSound()
+			handleBeat()
 			return true
 		}),
 	)
@@ -94,7 +141,7 @@ func NewRaythm() *ui.Page {
 		ui.PageOpts.Fill(app.Theme.BackgroundColor),
 		ui.PageOpts.OnInput(func() bool {
 			if inpututil.IsKeyJustPressed(ebiten.KeyEnter) {
-				playSound()
+				handleBeat()
 				return true
 			}
 

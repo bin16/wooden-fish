@@ -17,6 +17,9 @@ func NewSettings() *ui.Page {
 		ui.MenuOpts.TextItem(i18n.T(i18n.Theme), func() {
 			app.Load(NewThemeMenu())
 		}),
+		ui.MenuOpts.TextItem(i18n.T(i18n.Animation), func() {
+			app.Load(NewAnimMenu())
+		}),
 		ui.MenuOpts.OnExit(func() {
 			app.Load(MainMenu())
 		}),

@@ -1,8 +1,6 @@
 package page
 
 import (
-	"bytes"
-
 	"github.com/bin16/wooden-fish/app"
 	"github.com/bin16/wooden-fish/assets"
 	"github.com/bin16/wooden-fish/game"
@@ -10,7 +8,6 @@ import (
 	"github.com/bin16/wooden-fish/ui"
 	"github.com/bin16/wooden-fish/util"
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/audio/vorbis"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
 
@@ -18,20 +15,26 @@ func NewAutoMode() app.Scene {
 	var title = ui.NewUpper()
 
 	var anim = ui.NewAnim(
-		ui.AnimOpts.NewImageFromBytes(assets.DefaultAnimSheetBytes),
-		ui.AnimOpts.Size(48, 48),
 		ui.AnimOpts.AutoPlay(true),
 		ui.AnimOpts.Loop(true),
-		ui.AnimOpts.OnFrame(5, func() {
-			var s, _ = vorbis.DecodeF32(bytes.NewReader(assets.DefaultSoundBytes))
-			var ply, _ = util.AudioContext.NewPlayerF32(s)
+		ui.AnimOpts.Image(game.Animation.Image()),
+		ui.AnimOpts.Size(game.Animation.Size()),
+		ui.AnimOpts.FPS(util.NotZero(
+			game.Animation.AutoMode.FPS,
+			game.Animation.FPS,
+			9,
+		)),
+	)
+	for _, sound := range game.Animation.Sounds {
+		ui.AnimOpts.OnFrame(sound.FrameIndex, func() {
+			var ply = assets.NewAudioPlayer(sound.Source)
 
 			ply.Play()
-			title.NewText(i18n.T(i18n.MeritPlusOne))
+			title.NewText(i18n.T(sound.Text))
 
 			game.Tick()
-		}),
-	)
+		})(anim)
+	}
 
 	var main = ui.Center(
 		ui.NewVBox(
@@ -46,7 +49,7 @@ func NewAutoMode() app.Scene {
 	var statInfo = ui.Top(
 		ui.NewText(
 			ui.TextOpts.Pull(func() string {
-				return i18n.T(i18n.Merits_Is, game.Game.Count)
+				return i18n.T(game.Animation.Text, game.Game.Count)
 			}),
 		),
 	)
