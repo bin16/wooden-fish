@@ -19,7 +19,7 @@ func main() {
 
 	app.Load(page.MainMenu())
 
-	ebiten.SetWindowSize(420, 320)
+	ebiten.SetWindowSize(480, 360)
 	ebiten.SetWindowTitle(i18n.T(i18n.APP_NAME))
 	ebiten.SetWindowIcon(
 		[]image.Image{

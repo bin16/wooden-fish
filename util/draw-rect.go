@@ -55,16 +55,10 @@ func DrawRect(screen *ebiten.Image, dr image.Rectangle, opts ...DrawRectOpt) {
 	}
 
 	var (
-		d   = op.strokeWidth
-		clr = op.color
 		rad = op.radius
 	)
 	rad = max(0, rad)
 	rad = min(rad, 5)
-
-	if d == 0 || clr == nil {
-		return
-	}
 
 	var dl = [][]int{
 		{},
@@ -88,6 +82,16 @@ func DrawRect(screen *ebiten.Image, dr image.Rectangle, opts ...DrawRectOpt) {
 				image.Rect(d, dr.Dy()-i-1, dr.Dx()-d, dr.Dy()-i).Add(dr.Min),
 			).(*ebiten.Image).Fill(clr)
 		}
+
+		// return
+	}
+
+	var (
+		d   = op.strokeWidth
+		clr = op.color
+	)
+	if d == 0 || clr == nil {
+		return
 	}
 
 	var (

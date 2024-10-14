@@ -15,14 +15,43 @@ func NewThemeMenu() *ui.Page {
 			app.Load(NewSettings())
 		}),
 	)
+
+	var p = ui.NewSpace(ui.SpaceOpts.Space(2, 4))
+
 	for i, th := range app.ThemeOptions {
-		var o = ui.MenuOpts.TextItem(i18n.T(th.Name), func() {
+		var pal = ui.NewPalette(
+			ui.PaletteOpts.Width(24),
+			ui.PaletteOpts.Height(12),
+			ui.PaletteOpts.BorderRadius(0),
+			ui.PaletteOpts.BorderColor(th.BackgroundColor),
+			// ui.PaletteOpts.Border(0),
+			ui.PaletteOpts.Colors(
+				th.BackgroundColor,
+				th.Color,
+				// th.SecondaryColor,
+				th.AccentColor,
+			),
+		)
+
+		var text = ui.NewText(
+			ui.TextOpts.Content(i18n.T(th.Name)),
+			ui.TextOpts.Padding(0, 0, 0, 2),
+		)
+
+		var item = ui.NewHBox(
+			ui.HBoxOpts.AlignItems(ui.AlignCenter),
+			ui.HBoxOpts.Contents(
+				pal,
+				text,
+			),
+		)
+
+		ui.MenuOpts.Item(p(item), func() {
 			app.SetTheme(th)
 			game.Game.ThemeID = th.ID
 			game.Save()
 			app.Load(NewThemeMenu())
-		})
-		o(menu)
+		})(menu)
 
 		if th.ID == app.Theme.ID {
 			menu.HandleFocus(i)

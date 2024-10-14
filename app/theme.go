@@ -123,9 +123,9 @@ func NewDefaultTheme() *theme {
 	return &theme{
 		ID:              "id-theme-default",
 		Name:            "Default Theme",
-		Color:           hexcolor.New("#E7D7C1"),
-		BackgroundColor: hexcolor.New("#A78A7F"),
-		SecondaryColor:  hexcolor.New("#735751"),
+		Color:           hexcolor.New("#735751"),
+		BackgroundColor: hexcolor.New("#E7D7C1"),
+		SecondaryColor:  hexcolor.New("#A78A7F"),
 		AccentColor:     hexcolor.New("#BF4342"),
 	}
 }
