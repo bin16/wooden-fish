@@ -81,7 +81,7 @@ func (u *Scene) Blur() {
 }
 
 func (u *Scene) IsDisabled() bool {
-	return false
+	return u.disabled
 }
 
 func (u *Scene) Disable() {

@@ -1,13 +1,11 @@
 package util
 
-import (
-	"cmp"
-)
-
 // a > 0
 // a   => [0, a) 0, 1, 2, ..., a - 1
 // a,b => [a, b) a, a+1, ...,  b - 1
-func Range[T cmp.Ordered](a T, b ...T) (r []T) {
+func Range[T int](a T, b ...T) (r []T) {
+	r = make([]T, 0)
+
 	var (
 		zero = T(0)
 		low  = zero
@@ -17,6 +15,9 @@ func Range[T cmp.Ordered](a T, b ...T) (r []T) {
 	if len(b) > 0 {
 		low = a
 		high = b[0]
+		if high < low {
+			step = T(-1)
+		}
 	}
 	if len(b) > 1 {
 		step = b[1]
@@ -31,7 +32,7 @@ func Range[T cmp.Ordered](a T, b ...T) (r []T) {
 	}
 
 	if high < low && step < zero {
-		for d := low; d < high; d += step {
+		for d := low; d > high; d += step {
 			r = append(r, d)
 		}
 

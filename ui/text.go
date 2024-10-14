@@ -72,6 +72,10 @@ func (u *Text) Draw(screen *ebiten.Image) {
 		float64(p.Y),
 	)
 
+	if u.IsDisabled() {
+		op.ColorScale.ScaleAlpha(.5)
+	}
+
 	text.Draw(screen, u.textContent, u.face, op)
 }
 
@@ -122,6 +126,12 @@ func (TextOptions) FontFace(face font.Face) TextOpt {
 func (TextOptions) Pull(fn func() string) TextOpt {
 	return func(text *Text) {
 		text.getFn = fn
+	}
+}
+
+func (TextOptions) SetDisabled(b bool) TextOpt {
+	return func(text *Text) {
+		text.SetDisabled(b)
 	}
 }
 
