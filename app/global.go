@@ -11,3 +11,7 @@ func Load(p Scene) {
 func Push(p Scene) {
 	app.Push(p)
 }
+
+func IsJS() bool {
+	return is_wasm
+}

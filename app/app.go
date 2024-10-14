@@ -10,6 +10,8 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
 
+var is_wasm = false
+
 type App struct {
 	stack Stack
 
@@ -114,5 +116,7 @@ func (app *App) loadScene(p Scene) {
 }
 
 func (u *App) Quit() {
-	u.errors = append(u.errors, ebiten.Termination)
+	if !is_wasm {
+		u.errors = append(u.errors, ebiten.Termination)
+	}
 }
