@@ -29,9 +29,9 @@ func main() {
 	ebiten.SetWindowPosition(200, 200)
 	ebiten.SetWindowIcon(
 		[]image.Image{
-			assets.Icon_32x32,
-			assets.Icon_16x16,
-			assets.Icon_8x8,
+			assets.NewImage(assets.Icon32x32),
+			assets.NewImage(assets.Icon16x16),
+			assets.NewImage(assets.Icon8x8),
 		},
 	)
 	ebiten.SetWindowTitle("功德+1")
