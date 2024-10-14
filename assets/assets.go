@@ -1,11 +1,7 @@
 package assets
 
 import (
-	"bytes"
 	_ "embed"
-
-	"github.com/bin16/wooden-fish/util"
-	"github.com/hajimehoshi/ebiten/v2/audio/vorbis"
 )
 
 var (
@@ -23,14 +19,44 @@ var (
 
 	//go:embed "wooden-fish-48x48-sheet.png"
 	sheet_bytes []byte
+
+	//go:embed "wooden-fish-32x32-anim.png"
+	draft_sheet_bytes []byte
+
+	//go:embed "tap-tap-96x96-sheet.png"
+	tap_tap_sheet_bytes []byte
+
+	//go:embed "ding.ogg"
+	ding_bytes []byte
+
+	//go:embed "dong.ogg"
+	dong_bytes []byte
 )
 
 var (
-	Icon_8x8              = util.NewImageFromBytes(icon_8x8_bytes)
-	Icon_16x16            = util.NewImageFromBytes(icon_16x16_bytes)
-	Icon_32x32            = util.NewImageFromBytes(icon_32x32_bytes)
-	DefaultSoundBytes     = sound_bytes
-	DefaultSoundStream, _ = vorbis.DecodeF32(bytes.NewReader(sound_bytes))
-	DefaultAnimSheetBytes = sheet_bytes
-	DefaultAnimSheet      = util.NewImageFromBytes(sheet_bytes)
+	DefaultSound = "sound.ogg"
+	DingSound    = "ding.ogg"
+	DongSound    = "dong.ogg"
+
+	Icon8x8   = "wooden-fish-icon-8x8.png"
+	Icon16x16 = "wooden-fish-icon-16x16.png"
+	Icon32x32 = "wooden-fish-icon-32x32.png"
+
+	DefaultSheet = "wooden-fish-48x48-sheet.png"
+	DraftSheet   = "wooden-fish-32x32-anim.png"
+	TapTapSheet  = "tap-tap-96x96-sheet.png"
 )
+
+func init() {
+	Set(DefaultSound, sound_bytes)
+	Set(DingSound, ding_bytes)
+	Set(DongSound, dong_bytes)
+
+	Set(Icon8x8, icon_8x8_bytes)
+	Set(Icon16x16, icon_16x16_bytes)
+	Set(Icon32x32, icon_32x32_bytes)
+
+	Set(DefaultSheet, sheet_bytes)
+	Set(DraftSheet, draft_sheet_bytes)
+	Set(TapTapSheet, tap_tap_sheet_bytes)
+}
