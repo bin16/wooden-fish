@@ -31,6 +31,7 @@ var (
 
 	Settings = "Settings"
 	Language = "Language"
+	Theme    = "Theme"
 
 	Perfect = "Perfect"
 	Good    = "Good"
@@ -54,6 +55,7 @@ func init() {
 
 	message.SetString(SC, Language, "语言")
 	message.SetString(SC, Settings, "设置")
+	message.SetString(SC, Theme, "主题")
 	message.SetString(SC, RhythmMode, "音游模式")
 	message.SetString(SC, FreeMode, "自由模式")
 	message.SetString(SC, AutoMode, "自动模式")
@@ -66,6 +68,10 @@ func init() {
 	message.SetString(SC, Back, "返回")
 	message.SetString(SC, Beat, "敲")
 	message.SetString(SC, WoodenFish, "木鱼")
+
+	message.SetString(SC, "Default Theme", "默认主题")
+	message.SetString(SC, "High Contrast Theme", "高对比度主题")
+	message.SetString(SC, "High Contrast Theme (Dark)", "高对比度主题（暗黑）")
 }
 
 func T(s string, args ...any) string {
