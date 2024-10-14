@@ -23,15 +23,16 @@ var (
 
 	Quit         = "Quit"
 	Merit        = "Merit"
-	MeritPlusOne = "Merit +1"
+	MeritPlusOne = "Merit+1"
 	Merits_Is    = "Merits: %d"
 	Back         = "Back"
 	Next         = "Next"
 	Exit         = "Exit"
 
-	Settings = "Settings"
-	Language = "Language"
-	Theme    = "Theme"
+	Settings  = "Settings"
+	Language  = "Language"
+	Theme     = "Theme"
+	Animation = "Animation"
 
 	Perfect = "Perfect"
 	Good    = "Good"
@@ -56,6 +57,7 @@ func init() {
 	message.SetString(SC, Language, "语言")
 	message.SetString(SC, Settings, "设置")
 	message.SetString(SC, Theme, "主题")
+	message.SetString(SC, Animation, "动画")
 	message.SetString(SC, RhythmMode, "音游模式")
 	message.SetString(SC, FreeMode, "自由模式")
 	message.SetString(SC, AutoMode, "自动模式")
@@ -72,6 +74,13 @@ func init() {
 	message.SetString(SC, "Default Theme", "默认主题")
 	message.SetString(SC, "High Contrast Theme", "高对比度主题")
 	message.SetString(SC, "High Contrast Theme (Dark)", "高对比度主题（暗黑）")
+	message.SetString(SC, "Default Animation", "默认动画（木鱼）")
+	message.SetString(SC, "Draft Animation", "草图动画")
+	message.SetString(SC, "Test Animation", "测试动画")
+
+	message.SetString(SC, "Ding~", "叮~")
+	message.SetString(SC, "Dong~", "咚~")
+	message.SetString(SC, "Scores: %d", "分数：%d")
 }
 
 func T(s string, args ...any) string {

@@ -23,6 +23,7 @@ type Anim struct {
 	maxTick      int
 	frameHandler map[int][]func()
 	onEnd        []func()
+	onPlay       []func(k int)
 	playing      bool
 }
 
@@ -59,6 +60,10 @@ func (u *Anim) Draw(screen *ebiten.Image) {
 }
 
 func (u *Anim) triggerFrame(index int) {
+	for _, fn := range u.onPlay {
+		fn(index)
+	}
+
 	if u.frameHandler == nil {
 		return
 	}
@@ -71,20 +76,34 @@ func (u *Anim) triggerFrame(index int) {
 }
 
 func (u *Anim) Update() error {
+	if u.index == -1 {
+		u.index = 0
+		u.tick = 0
+		if u.playing {
+			u.triggerFrame(0) // start
+			// TODO: emit start
+		}
+	}
+
 	if u.playing {
+
+		var max = u.image.Bounds().Dy()/u.height - 1
+
 		u.tick += 1
 		if u.tick > ebiten.TPS()/u.FPS {
 			u.tick = 0
 			u.index += 1
-			u.triggerFrame(u.index)
+			if u.index <= max {
+				u.triggerFrame(u.index)
+			}
 		}
 
-		var max = u.image.Bounds().Dy()/u.height - 1
 		if u.index > max {
-			u.index = 0
 			for _, fn := range u.onEnd {
 				fn()
 			}
+			u.index = 0
+			u.triggerFrame(0)
 			u.playing = u.loop
 		}
 	}
@@ -97,6 +116,7 @@ func (u *Anim) Play() {
 		u.playing = true
 		u.index = 0
 		u.tick = 0
+		u.triggerFrame(0)
 	}
 }
 
@@ -110,6 +130,10 @@ func (u *Anim) FrameIndex() int {
 
 func (u *Anim) OnEnd(fn func()) {
 	u.onEnd = append(u.onEnd, fn)
+}
+
+func (u *Anim) OnPlay(fn func(k int)) {
+	u.onPlay = append(u.onPlay, fn)
 }
 
 type AnimOpt func(u *Anim)
@@ -161,6 +185,12 @@ func (AnchorOptions) OnEnd(fn func()) AnimOpt {
 	}
 }
 
+func (AnchorOptions) OnPlay(fn func(k int)) AnimOpt {
+	return func(u *Anim) {
+		u.OnPlay(fn)
+	}
+}
+
 func (AnimOptions) OnFrame(index int, fn func()) AnimOpt {
 	return func(u *Anim) {
 		if u.frameHandler == nil {
@@ -181,6 +211,7 @@ func NewAnim(opts ...AnimOpt) *Anim {
 		height: 32,
 		image:  img,
 		FPS:    9,
+		index:  -1,
 	}
 	for _, o := range opts {
 		o(anim)

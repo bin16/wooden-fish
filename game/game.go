@@ -12,17 +12,20 @@ type game struct {
 	Count    int          `json:"count"`
 	Language language.Tag `json:"lang"`
 	ThemeID  string       `json:"theme"`
+	AnimID   string       `json:"anim"`
 }
 
 var Game = game{
 	Count:    0,
 	Language: language.English,
-	ThemeID:  "",
+	ThemeID:  "id-theme-default",
+	AnimID:   "id-anim-default",
 }
 
 func init() {
 	save.Read("game.save.json", &Game)
-	app.LoadTheme(Game.ThemeID)
+	app.SetTheme(Game.ThemeID)
+	SetAnim(Game.AnimID)
 }
 
 func Save() {

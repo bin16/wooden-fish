@@ -87,7 +87,7 @@ func (themeOptions) AccentColor(clr hexcolor.Color) ThemeOpt {
 
 var ThemeOpts themeOptions
 
-func SetTheme(th *theme) {
+func LoadTheme(th *theme) {
 	for _, item := range ThemeOptions {
 		if item.ID == th.ID {
 			Theme = *th
@@ -99,7 +99,7 @@ func SetTheme(th *theme) {
 	Theme = *th
 }
 
-func LoadTheme(id string) {
+func SetTheme(id string) {
 	for _, item := range ThemeOptions {
 		if item.ID == id {
 			Theme = *item
