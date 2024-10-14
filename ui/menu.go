@@ -20,13 +20,19 @@ type Menu struct {
 
 func (u *Menu) HandleTouchInput() bool {
 	for i, n := range u.children {
+
 		if app.IsTappedInBounds(n.Bounds()) {
+			if n.IsDisabled() {
+				return false
+			}
+
 			if u.HandleFocus(i) {
 				if u.Enter() {
 					return true
 				}
 			}
 		}
+
 	}
 
 	return false
@@ -47,6 +53,12 @@ func (u *Menu) HandleMouseInput() bool {
 	for i, n := range u.Children() {
 
 		if cursor.In(n.Bounds()) {
+
+			if n.IsDisabled() {
+				ebiten.SetCursorShape(ebiten.CursorShapeNotAllowed)
+				return false
+			}
+
 			if u.HandleFocus(i) {
 				ebiten.SetCursorShape(ebiten.CursorShapePointer)
 
@@ -71,6 +83,10 @@ func (u *Menu) HandleFocus(k int) bool {
 	}
 
 	if k > len(u.children)-1 {
+		return false
+	}
+
+	if u.children[k].IsDisabled() {
 		return false
 	}
 
@@ -99,12 +115,24 @@ func (u *Menu) HasFocus() bool {
 }
 
 func (u *Menu) FocusUp() bool {
+	var (
+		k   = u.activeIndex
+		cnt = len(u.children)
+	)
 	if !u.HasFocus() {
-		return u.HandleFocus(len(u.Children()) - 1)
+		k = cnt
 	}
 
-	if u.HandleFocus(u.activeIndex - 1) {
-		return true
+	var queue = []int{}
+	queue = append(queue, util.Range(k-1, -1)...)
+	if u.loopSearch {
+		queue = append(queue, util.Range(cnt-1, k)...) // loop search
+	}
+
+	for _, k1 := range queue {
+		if u.HandleFocus(k1) {
+			return true
+		}
 	}
 
 	u.Blur()
@@ -112,12 +140,24 @@ func (u *Menu) FocusUp() bool {
 }
 
 func (u *Menu) FocusDown() bool {
+	var (
+		k   = u.activeIndex
+		cnt = len(u.children)
+	)
 	if !u.HasFocus() {
-		return u.HandleFocus(0)
+		k = -1
 	}
 
-	if u.HandleFocus(u.activeIndex + 1) {
-		return true
+	var queue = []int{}
+	queue = append(queue, util.Range(k+1, cnt)...)
+	if u.loopSearch {
+		queue = append(queue, util.Range(0, k)...) // loop search
+	}
+
+	for _, k1 := range queue {
+		if u.HandleFocus(k1) {
+			return true
+		}
 	}
 
 	u.Blur()
@@ -251,8 +291,15 @@ func (MenuOptions) OnExit(onExit func()) MenuOpt {
 	}
 }
 
+func (MenuOptions) LoopSearch(b bool) MenuOpt {
+	return func(menu *Menu) {
+		menu.loopSearch = b
+	}
+}
+
 func NewMenu(opts ...MenuOpt) *Menu {
 	var menu = &Menu{}
+	menu.loopSearch = true
 	for _, o := range opts {
 		o(menu)
 	}

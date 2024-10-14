@@ -21,9 +21,9 @@ func MainMenu() *ui.Page {
 		ui.MenuOpts.TextItem(i18n.T(i18n.Settings), func() {
 			app.Load(NewSettings())
 		}),
-		// ui.MenuOpts.TextItem(i18n.T(i18n.Quit), func() {
-		// 	app.Quit()
-		// }),
+		ui.MenuOpts.TextItem(i18n.T(i18n.Quit), func() {
+			app.Quit()
+		}, ui.TextOpts.SetDisabled(app.IsJS())),
 	)
 
 	var version = NewVersionInfo()

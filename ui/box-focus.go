@@ -50,7 +50,9 @@ func (u *Box) FocusNext() bool {
 
 	var queue = []int{}
 	queue = append(queue, util.Range(k+1, cnt)...)
-	queue = append(queue, util.Range(0, k)...) // loop search
+	if u.loopSearch {
+		queue = append(queue, util.Range(0, k)...) // loop search
+	}
 
 	for _, i := range queue {
 		var n = u.Child(i)
@@ -188,7 +190,9 @@ func (u *Box) FocusRight() bool {
 
 	var queue = []int{}
 	queue = append(queue, util.Range(k+1, cnt)...)
-	queue = append(queue, util.Range(0, k)...) // loop search
+	if u.loopSearch {
+		queue = append(queue, util.Range(0, k)...) // loop search
+	}
 
 	for _, i := range queue {
 		var n = u.Child(i)
@@ -221,7 +225,9 @@ func (u *Box) FocusDown() bool {
 
 	var queue = []int{}
 	queue = append(queue, util.Range(k+1, cnt)...)
-	queue = append(queue, util.Range(0, k)...) // loop search
+	if u.loopSearch {
+		queue = append(queue, util.Range(0, k)...) // loop search
+	}
 
 	for _, i := range queue {
 		var n = u.Child(i)

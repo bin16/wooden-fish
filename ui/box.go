@@ -10,9 +10,10 @@ import (
 // Box is basic Container
 type Box struct {
 	Scene
-	children []app.Scene
-	cr       image.Rectangle
-	sr       []image.Rectangle
+	children   []app.Scene
+	cr         image.Rectangle
+	sr         []image.Rectangle
+	loopSearch bool
 }
 
 func (u *Box) HandleInput() bool {
@@ -120,6 +121,12 @@ var BoxOpts BoxOptions
 func (BoxOptions) Contents(items ...app.Scene) BoxOpt {
 	return func(box *Box) {
 		box.children = append(box.children, items...)
+	}
+}
+
+func (BoxOptions) LoopSearch(b bool) BoxOpt {
+	return func(box *Box) {
+		box.loopSearch = b
 	}
 }
 
