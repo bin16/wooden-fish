@@ -247,7 +247,7 @@ func (u *Menu) Draw(screen *ebiten.Image) {
 				screen,
 				n.Bounds(),
 				util.DrawRectOpts.StrokeWidth(1),
-				util.DrawRectOpts.Color(app.Theme.SecondaryColor),
+				util.DrawRectOpts.Color(app.Theme.AccentColor),
 				util.DrawRectOpts.Radius(2),
 			)
 		}
