@@ -55,6 +55,10 @@ func (u *Text) Layout(ow, oh int) (bw, bh int) {
 }
 
 func (u *Text) Draw(screen *ebiten.Image) {
+	if u.bounds.Empty() {
+		return
+	}
+
 	var op = &text.DrawOptions{}
 	if clr := u.color; clr != nil {
 		op.ColorScale.ScaleWithColor(clr)

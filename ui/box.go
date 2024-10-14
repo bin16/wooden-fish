@@ -76,7 +76,13 @@ func (u *Box) Update() error {
 	return nil
 }
 
+var debug = true
+
 func (u *Box) Draw(screen *ebiten.Image) {
+	if u.bounds.Empty() {
+		return
+	}
+
 	u.Scene.Draw(screen)
 	for _, n := range u.children {
 		n.Draw(screen)

@@ -20,15 +20,14 @@ func NewThemeMenu() *ui.Page {
 
 	for i, th := range app.ThemeOptions {
 		var pal = ui.NewPalette(
-			ui.PaletteOpts.Width(24),
-			ui.PaletteOpts.Height(12),
+			ui.PaletteOpts.Width(16),
+			ui.PaletteOpts.Height(16),
 			ui.PaletteOpts.BorderRadius(0),
 			ui.PaletteOpts.BorderColor(th.BackgroundColor),
-			// ui.PaletteOpts.Border(0),
 			ui.PaletteOpts.Colors(
 				th.BackgroundColor,
 				th.Color,
-				// th.SecondaryColor,
+				th.SecondaryColor,
 				th.AccentColor,
 			),
 		)

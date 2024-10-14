@@ -241,6 +241,10 @@ func (u *Menu) OnExit(fn func()) {
 }
 
 func (u *Menu) Draw(screen *ebiten.Image) {
+	if u.bounds.Empty() {
+		return
+	}
+
 	for i, n := range u.children {
 		if u.activeIndex == i {
 			util.DrawRect(

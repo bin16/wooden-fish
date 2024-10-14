@@ -1,6 +1,7 @@
 package ui
 
 import (
+	"fmt"
 	"image"
 	"image/color"
 
@@ -13,23 +14,24 @@ type Palette struct {
 	Scene
 	maxWidth, maxHeight int
 	colors              []color.Color
-	isVertical          bool
-	cache               *ebiten.Image
-	bg                  *ebiten.Image
+	maxColumns          int
 	sr                  []image.Rectangle
 	borderColor         color.Color
 	gapColor            color.Color
 	gap                 int
 	border              int
 	borderRadius        int
+	r0                  image.Rectangle
 }
 
 func (u *Palette) Layout(ow, oh int) (bw, bh int) {
 	var (
-		cnt    = len(u.colors)
-		uw, uh int
-		b      = u.border
-		gap    = u.gap
+		cnt     = len(u.colors)
+		uw, uh  int
+		b       = u.border
+		gap     = u.gap
+		columns = util.OR(u.maxColumns > 0, u.maxColumns, cnt)
+		rows    = cnt/columns + util.OR(cnt%columns > 0, 1, 0)
 	)
 	if len(u.sr) != cnt {
 		u.sr = make([]image.Rectangle, cnt)
@@ -39,35 +41,36 @@ func (u *Palette) Layout(ow, oh int) (bw, bh int) {
 		return u.maxWidth, u.maxHeight
 	}
 
-	uw = (u.maxWidth - b*2 - gap*(cnt-1)) / cnt
-	uh = (u.maxHeight - b*2)
+	uw = (u.maxWidth - b*2 - gap*(columns-1)) / columns
+	uh = (u.maxHeight - b*2 - gap*(rows-1)) / rows
 
 	for i := range u.colors {
 		var (
-			x = u.Bounds().Min.X + b + gap*i + uw*i
-			y = u.Bounds().Min.Y + b
-			r = image.Rect(0, 0, uw, uh).Add(image.Pt(x, y))
+			col = i % columns
+			row = i / columns
+			x   = b + gap*col + uw*col
+			y   = b + gap*row + uh*row
+			r   = image.Rect(0, 0, uw, uh).Add(image.Pt(x, y))
 		)
 
 		u.sr[i] = r
 	}
 
-	bw = uw*cnt + b*2 + gap*(cnt-1)
-	bh = u.maxHeight
+	bw = uw*columns + b*2 + gap*(columns-1)
+	bh = uh*rows + b*2 + gap*(rows-1)
 	return
 }
 
 func (u *Palette) Draw(screen *ebiten.Image) {
-	if len(u.sr) != len(u.colors) {
+	if u.bounds.Empty() || len(u.sr) != len(u.colors) {
 		return
 	}
 
 	for i, clr := range u.colors {
 		util.DrawRect(
 			screen,
-			u.sr[i],
+			u.sr[i].Add(u.bounds.Min),
 			util.DrawRectOpts.Fill(clr),
-			// util.DrawRectOpts.Color(hexcolor.New("#f00")),
 			util.DrawRectOpts.StrokeWidth(0),
 		)
 	}
@@ -75,6 +78,14 @@ func (u *Palette) Draw(screen *ebiten.Image) {
 	if u.border != 0 {
 		util.StrokeRect(screen, u.Bounds(), u.borderColor, u.borderRadius)
 	}
+}
+
+func (u *Palette) SetBounds(r image.Rectangle) {
+	if r0 := u.bounds; r != r0 {
+		fmt.Println(r, "<--", r0)
+	}
+
+	u.Scene.SetBounds(r)
 }
 
 type PaletteOpt func(pal *Palette)
@@ -134,6 +145,12 @@ func (PaletteOptions) Height(d int) PaletteOpt {
 	}
 }
 
+func (PaletteOptions) Columns(d int) PaletteOpt {
+	return func(pal *Palette) {
+		pal.maxColumns = d
+	}
+}
+
 var PaletteOpts PaletteOptions
 
 func NewPalette(opts ...PaletteOpt) *Palette {
@@ -143,6 +160,7 @@ func NewPalette(opts ...PaletteOpt) *Palette {
 		gap:         0,
 		maxWidth:    32,
 		maxHeight:   12,
+		maxColumns:  2,
 	}
 	for _, o := range opts {
 		o(pal)
