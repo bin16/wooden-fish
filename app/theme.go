@@ -1,6 +1,7 @@
 package app
 
 import (
+	"encoding/json"
 	"image/color"
 
 	"github.com/bin16/go-hexcolor"
@@ -38,12 +39,21 @@ var ThemeOptions []*theme = []*theme{
 }
 
 type theme struct {
+	ID              string      `json:"id"`
+	Name            string      `json:"name"`
+	Color           color.Color `json:"color"`
+	SecondaryColor  color.Color `json:"secondaryColor"`
+	BackgroundColor color.Color `json:"backgroundColor"`
+	AccentColor     color.Color `json:"accentColor"`
+}
+
+type ThemeData struct {
 	ID              string `json:"id"`
 	Name            string `json:"name"`
-	Color           color.Color
-	SecondaryColor  color.Color
-	BackgroundColor color.Color
-	AccentColor     color.Color
+	Color           string `json:"color"`
+	SecondaryColor  string `json:"secondaryColor"`
+	BackgroundColor string `json:"backgroundColor"`
+	AccentColor     string `json:"accentColor"`
 }
 
 type ThemeOpt func(u *theme)
@@ -85,6 +95,23 @@ func (themeOptions) AccentColor(clr hexcolor.Color) ThemeOpt {
 	}
 }
 
+func (themeOptions) Import(raw *ThemeData) ThemeOpt {
+	return func(u *theme) {
+		if raw.ID != "" {
+			u.ID = raw.ID
+		}
+
+		if raw.Name != "" {
+			u.Name = raw.Name
+		}
+
+		u.Color = hexcolor.New(raw.Color)
+		u.SecondaryColor = hexcolor.New(raw.SecondaryColor)
+		u.BackgroundColor = hexcolor.New(raw.BackgroundColor)
+		u.AccentColor = hexcolor.New(raw.AccentColor)
+	}
+}
+
 var ThemeOpts themeOptions
 
 func LoadTheme(th *theme) {
@@ -117,6 +144,26 @@ func NewTheme(opts ...ThemeOpt) *theme {
 	}
 
 	return th
+}
+
+func RegisterTheme(th *theme) {
+	ThemeOptions = append(ThemeOptions, th)
+}
+
+func NewThemeFromBytes(data []byte) (*theme, error) {
+	var raw = &ThemeData{}
+	err := json.Unmarshal(data, raw)
+
+	var th = &theme{}
+
+	th.ID = raw.ID
+	th.Name = raw.Name
+	th.Color = hexcolor.New(raw.Color)
+	th.SecondaryColor = hexcolor.New(raw.SecondaryColor)
+	th.BackgroundColor = hexcolor.New(raw.BackgroundColor)
+	th.AccentColor = hexcolor.New(raw.AccentColor)
+
+	return th, err
 }
 
 func NewDefaultTheme() *theme {
