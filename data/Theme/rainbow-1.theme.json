@@ -1,0 +1,8 @@
+{
+    "id": "id-theme-rainbow",
+    "name": "Rainbow",
+    "color": "#227c9d",
+    "secondaryColor": "#17c3b2",
+    "backgroundColor": "#fef9ef",
+    "accentColor": "#fe6d73"
+}

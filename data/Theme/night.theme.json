@@ -1,0 +1,8 @@
+{
+    "id": "id-theme-night",
+    "name": "Night",
+    "color": "#f0f0f0",
+    "secondaryColor": "#f0f0f0",
+    "backgroundColor": "#291c46",
+    "accentColor": "#ecbd3b"
+}
