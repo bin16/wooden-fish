@@ -27,9 +27,9 @@ func NewLangMenu() *ui.Page {
 			menu.HandleFocus(i)
 		}
 	}
-	ui.MenuOpts.TextItem(i18n.T(i18n.Back), func() {
-		app.Load(NewSettings())
-	}, ui.TextOpts.Color(app.Theme.SecondaryColor))(menu)
+	// ui.MenuOpts.TextItem(i18n.T(i18n.Back), func() {
+	// 	app.Load(NewSettings())
+	// }, ui.TextOpts.Color(app.Theme.SecondaryColor))(menu)
 
 	var title = ui.NewText(
 		ui.TextOpts.Content(i18n.T(i18n.Language)),
@@ -45,10 +45,18 @@ func NewLangMenu() *ui.Page {
 		),
 	)
 
+	var back = NewBack(func(data ...any) bool {
+		app.Load(NewSettings())
+		return true
+	})
+
 	var page = ui.NewPage(
 		ui.PageOpts.Fill(app.Theme.BackgroundColor),
 		ui.PageOpts.Contents(
-			ui.Center(box),
+			p(ui.Layers(
+				ui.Center(box),
+				back,
+			)),
 		),
 		ui.PageOpts.OnInput(func() bool {
 			if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonRight) {

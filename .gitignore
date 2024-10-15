@@ -5,3 +5,5 @@ build.ps1
 dist/
 scripts/
 *.syso
+# data/Theme/
+data/Anim/

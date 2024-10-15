@@ -77,6 +77,34 @@ func (u *Menu) HandleMouseInput() bool {
 	return false
 }
 
+func (u *Menu) fixScroll() {
+	if u.activeIndex < 0 {
+		u.offset = image.Pt(0, 0)
+		return
+	}
+
+	if u.activeIndex > len(u.children)-1 {
+		u.offset = image.Pt(0, 0)
+		return
+	}
+
+	var n = u.Child(u.activeIndex)
+
+	if d := n.Bounds().Min.Y - u.bounds.Min.Y; d < 0 {
+		u.offset = u.offset.Sub(image.Pt(0, d))
+	}
+
+	if d := n.Bounds().Max.Y - u.bounds.Max.Y; d > 0 {
+		u.offset = u.offset.Sub(image.Pt(0, d))
+	}
+}
+
+func (u *Menu) Update() error {
+	u.fixScroll()
+
+	return u.Box.Update()
+}
+
 func (u *Menu) HandleFocus(k int) bool {
 	if k < 0 {
 		return false
@@ -245,18 +273,31 @@ func (u *Menu) Draw(screen *ebiten.Image) {
 		return
 	}
 
+	var img = screen.SubImage(u.bounds).(*ebiten.Image)
+
 	for i, n := range u.children {
-		if u.activeIndex == i {
-			util.DrawRect(
-				screen,
-				n.Bounds(),
-				util.DrawRectOpts.StrokeWidth(1),
-				util.DrawRectOpts.Color(app.Theme.AccentColor),
-				util.DrawRectOpts.Radius(3),
-			)
+
+		if !n.Bounds().Overlaps(u.bounds) {
+			continue
 		}
 
-		n.Draw(screen)
+		if u.activeIndex == i {
+			util.StrokeRect(
+				img,
+				n.Bounds(),
+				app.Theme.AccentColor,
+				3,
+			)
+
+			// util.FillRect(
+			// 	img,
+			// 	n.Bounds(),
+			// 	app.Theme.SecondaryColor,
+			// 	3,
+			// )
+		}
+
+		n.Draw(img)
 	}
 }
 
@@ -264,6 +305,12 @@ type MenuOpt func(menu *Menu)
 type MenuOptions struct{}
 
 var MenuOpts MenuOptions
+
+func (MenuOptions) MaxHeight(d int) MenuOpt {
+	return func(menu *Menu) {
+		menu.maxHeight = d
+	}
+}
 
 func (MenuOptions) TextItem(s string, onEnter func(), opts ...TextOpt) MenuOpt {
 	var item = NewText(
@@ -303,6 +350,7 @@ func (MenuOptions) LoopSearch(b bool) MenuOpt {
 
 func NewMenu(opts ...MenuOpt) *Menu {
 	var menu = &Menu{}
+	menu.maxHeight = 100
 	menu.loopSearch = true
 	for _, o := range opts {
 		o(menu)

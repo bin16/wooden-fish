@@ -18,6 +18,12 @@ func NewThemeMenu() *ui.Page {
 
 	var p = ui.NewSpace(ui.SpaceOpts.Space(2, 4))
 
+	var b = ui.NewBorder(
+		ui.BorderOpts.Border(1),
+		ui.BorderOpts.Color(app.Theme.SecondaryColor),
+		ui.BorderOpts.BorderRadius(3),
+	)
+
 	for i, th := range app.ThemeOptions {
 		var pal = ui.NewPalette(
 			ui.PaletteOpts.Width(16),
@@ -56,9 +62,9 @@ func NewThemeMenu() *ui.Page {
 			menu.HandleFocus(i)
 		}
 	}
-	ui.MenuOpts.TextItem(i18n.T(i18n.Back), func() {
-		app.Load(NewSettings())
-	}, ui.TextOpts.Color(app.Theme.SecondaryColor))(menu)
+	// ui.MenuOpts.TextItem(i18n.T(i18n.Back), func() {
+	// 	app.Load(NewSettings())
+	// }, ui.TextOpts.Color(app.Theme.SecondaryColor))(menu)
 
 	var title = ui.NewText(
 		ui.TextOpts.Content(i18n.T(i18n.Theme)),
@@ -70,14 +76,47 @@ func NewThemeMenu() *ui.Page {
 		ui.VBoxOpts.AlignItems(ui.AlignCenter),
 		ui.VBoxOpts.Contents(
 			title,
-			menu,
+			b(p(menu)),
+		),
+	)
+
+	var helpExit = NewBack(func(data ...any) bool {
+		app.Load(MainMenu())
+		return true
+	})
+
+	var nav = ui.BottomRight(
+		ui.NewHBox(
+			ui.HBoxOpts.Contents(
+				ui.NewText(ui.TextOpts.Content("[")),
+				ui.OnTap(ui.NewText(
+					ui.TextOpts.Content(i18n.T(i18n.PrevItem)),
+					ui.TextOpts.Color(app.Theme.SecondaryColor),
+				), func(data ...any) bool {
+					menu.FocusUp()
+					return true
+				}),
+				ui.NewText(ui.TextOpts.Content("|")),
+				ui.OnTap(ui.NewText(
+					ui.TextOpts.Content(i18n.T(i18n.NextItem)),
+					ui.TextOpts.Color(app.Theme.SecondaryColor),
+				), func(data ...any) bool {
+					menu.FocusDown()
+					return true
+				}),
+				ui.NewText(ui.TextOpts.Content("]")),
+			),
 		),
 	)
 
 	var page = ui.NewPage(
 		ui.PageOpts.Fill(app.Theme.BackgroundColor),
 		ui.PageOpts.Contents(
-			ui.Center(box),
+			p(ui.Layers(
+				ui.Center(box),
+				helpExit,
+				nav,
+			)),
 		),
 		ui.PageOpts.OnInput(func() bool {
 			if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonRight) {

@@ -43,6 +43,10 @@ var (
 	WoodenFish = "Wooden Fish"
 
 	APP_NAME = "__app_name__"
+
+	PrevItem = "Previous"
+	Previous = "Previous"
+	NextItem = "Next"
 )
 
 var (
@@ -81,6 +85,10 @@ func init() {
 	message.SetString(SC, "Ding~", "叮~")
 	message.SetString(SC, "Dong~", "咚~")
 	message.SetString(SC, "Scores: %d", "分数：%d")
+
+	message.SetString(SC, Previous, "上一个")
+	message.SetString(SC, PrevItem, "上一个")
+	message.SetString(SC, NextItem, "下一个")
 }
 
 func T(s string, args ...any) string {

@@ -4,6 +4,7 @@ import (
 	"image"
 
 	"github.com/bin16/wooden-fish/app"
+	"github.com/hajimehoshi/ebiten/v2"
 )
 
 type AlignItems uint8
@@ -20,6 +21,9 @@ type VBox struct {
 
 	alignItems     AlignItems
 	justifyContent JustifyContent
+
+	maxHeight int // for scroll
+	offset    image.Point
 }
 
 func (u *VBox) Layout(ow, oh int) (bw, bh int) {
@@ -48,6 +52,15 @@ func (u *VBox) Layout(ow, oh int) (bw, bh int) {
 	bh = ch
 	if u.justifyContent != JustifyStart {
 		bh = oh
+	}
+
+	mh := u.maxHeight
+	if mh == 0 {
+		mh = oh
+	}
+
+	if bh > mh {
+		bh = mh
 	}
 
 	return
@@ -93,7 +106,7 @@ func (u *VBox) SetBounds(r image.Rectangle) {
 			w = r.Dx()
 		}
 
-		n.SetBounds(image.Rect(0, 0, w, h).Add(image.Pt(x, y)).Add(r.Min))
+		n.SetBounds(image.Rect(0, 0, w, h).Add(image.Pt(x, y)).Add(r.Min).Add(u.offset))
 	}
 }
 
@@ -125,6 +138,16 @@ func (VBoxOptions) BoxOpts(opts ...BoxOpt) VBoxOpt {
 func (VBoxOptions) Contents(items ...app.Scene) VBoxOpt {
 	return func(box *VBox) {
 		box.children = append(box.children, items...)
+	}
+}
+
+func (u *VBox) Draw(screen *ebiten.Image) {
+	// util.StrokeRect(screen, u.bounds, hexcolor.New("#0c0"))
+	// u.Box.Draw(screen)
+	for _, n := range u.children {
+		if n.Bounds().Overlaps(u.bounds) {
+			n.Draw(screen)
+		}
 	}
 }
 

@@ -1,7 +1,6 @@
 package ui
 
 import (
-	"fmt"
 	"image"
 	"image/color"
 
@@ -78,14 +77,6 @@ func (u *Palette) Draw(screen *ebiten.Image) {
 	if u.border != 0 {
 		util.StrokeRect(screen, u.Bounds(), u.borderColor, u.borderRadius)
 	}
-}
-
-func (u *Palette) SetBounds(r image.Rectangle) {
-	if r0 := u.bounds; r != r0 {
-		fmt.Println(r, "<--", r0)
-	}
-
-	u.Scene.SetBounds(r)
 }
 
 type PaletteOpt func(pal *Palette)

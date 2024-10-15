@@ -32,7 +32,7 @@ func loadAnim() error {
 			continue
 		}
 
-		// TODO: 1. read anim.Source
+		// 1. read anim.Source
 		// * data/Anim/anim-1/img-sheet-1.png
 		var imgName = path.Join(animDIR, folder, anim.Source)
 		data, err := save.ReadFile(imgName)
@@ -40,10 +40,13 @@ func loadAnim() error {
 			continue
 		}
 
+		// TODO: 1. load assets when need
+		// TODO: 2. fix Scene.Load, move asset load to Load()
+
 		assets.Set(imgName, data)
 		anim.Source = imgName
 
-		// TODO: 2. read anim.Sound.Source
+		// 2. read anim.Sound.Source
 		for i, sound := range anim.Sounds {
 			var soundName = path.Join(animDIR, folder, sound.Source)
 

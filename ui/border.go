@@ -43,9 +43,9 @@ func (u *Border) SetBounds(r image.Rectangle) {
 }
 
 func (u *Border) Draw(screen *ebiten.Image) {
-	util.StrokeRect(screen, u.Bounds(), u.Color, u.Radius)
-
 	u.Box.Draw(screen)
+
+	util.StrokeRect(screen, u.Bounds(), u.Color, u.Radius)
 }
 
 type BorderOpt func(u *Border)
